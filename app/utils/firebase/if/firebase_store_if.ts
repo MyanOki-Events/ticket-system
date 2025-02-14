@@ -1,8 +1,8 @@
 import { storeDb } from "../config/firebase_store";
-import { 
-    addDoc, 
+import {
+    addDoc,
     getDoc,
-    collection, 
+    collection,
     getDocs,
     deleteDoc,
     updateDoc,
@@ -18,15 +18,15 @@ export const addNewDocument = async (inputData: any, collectionName: string) => 
 export const getDocumentById = async (collectionName: string, id: string) => {
     const docRef = doc(storeDb, collectionName, id);
     const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-        return docSnap.data()
-    } 
+    if (docSnap.exists())
+        return {id, ...docSnap.data()}
     return null
 }
 
-export const getDocumentByWhereClause = async (collectionName: string, data: JsonObject) => {
-    // const q = query(collection(storeDb, collectionName), where(data.key, ">", 25));
-    return null
+export const getDocumentByWhereClause = async (collectionName: string, data: FirebaseWhere[]) => {
+    const dataQuery = query(collection(storeDb, collectionName), ...generateWhere(data));
+    const snapshot = await getDocs(dataQuery);
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
 export const getMultipleDocuments = async (collectionName: string) => {
@@ -41,3 +41,13 @@ export const deleteDocumentByDocId = async (collectionName: string, docId: strin
 export const updateDocumentByDocId = async (collectionName: string, docId: string, updateData: any) => {
     await updateDoc(doc(storeDb, collectionName, docId), updateData);
 };
+
+function generateWhere(data: FirebaseWhere[]) {
+    let wheres: any[] = []
+    if (data) {
+        for (let i = 0; i < data.length; i++) {
+            wheres.push(where(data[i].operand, data[i].operator, data[i].value))
+        }
+    }
+    return wheres
+}

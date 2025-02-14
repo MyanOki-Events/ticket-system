@@ -13,9 +13,8 @@ export const getAllUsers = async () => {
 export const getUserById = async (id: string) => {
     try {
         const result = await getDocumentById("users", id)
-        if(result) {
+        if (result)
             return result as User
-        }
     } catch (error) {
         console.log(error) // use firebase log trace later
     }
@@ -24,9 +23,10 @@ export const getUserById = async (id: string) => {
 
 export const getUserByEmail = async (email: string) => {
     try {
-        const result = await getDocumentByWhereClause("users", {"email": email})
-        if(result) {
-            return result as User
+        const data = [new FirebaseWhere("email", WhereOpt.WHERE_EQUAL, email)]
+        const result = await getDocumentByWhereClause("users", data)
+        if (result && result.length != 0) {
+            return result[0] as User
         }
     } catch (error) {
         console.log(error) // use firebase log trace later

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getAllUsers } from "../services/user_service";
+import Link from "next/link";
 
 //import { useSession } from "next-auth/react";
 
@@ -43,9 +44,9 @@ const AdminPage = () => {
                   <td>{user.name}</td>
                   <td>{user.email}</td>
                   <td>
-                    <span>
+                    <Link href={"admin/member/" + user.id}>
                       <i className="bi bi-clipboard-data"></i>
-                    </span>
+                    </Link>
                   </td>
                 </tr>
               ))}
