@@ -1,0 +1,107 @@
+/* app/login/LoginPage.module.css */
+.background-light-grey {
+  background-color: #f8f9fa; /* Light grey background color */
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #e6f7ff; /* Light blue background */
+  }
+  
+  .card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  .title {
+    font-size: 30px;
+    margin-bottom: 20px;
+    color: #2a9d8f; /* Blue color */
+  }
+  
+  .remark {
+    /* font-size: 14px; */
+    /* color: #ff0000; */
+    /* margin-bottom: 10px;  */
+    font-size: 12px;
+    color: #888; /* Grey color for note */
+    margin-bottom: 20px;
+  }
+
+  .note {
+    font-size: 12px;
+    color: #888; /* Grey color for note */
+    margin-bottom: 20px;
+  }
+  
+  .error {
+    font-size: 14px;
+    color: #ff0000; /* Red color for emphasis */
+    margin-bottom: 10px;
+    font-size: 12px;
+    /* position: absolute;
+    left: 5px;
+    bottom: -20px; */
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .input {
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .inputError {
+    border-color: #ff0000; /* Red border for invalid email */
+  }
+
+  .loginButton {
+    background-color: #2a9d8f; /* Blue button */
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .loginButton:hover {
+    background-color: #2a9d8f; /* Darker blue on hover */
+  }
+  
+  /* Responsive design for mobile view */
+  @media (max-width: 600px) {
+    .card {
+      width: 100%;
+      padding: 15px;
+    }
+  }
+
+ 
+  .card {
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .btn-block {
+    width: 100%;
+  }
+  

@@ -1,0 +1,46 @@
+//import { signOut } from 'next-auth/react';
+import { SetStateAction, useEffect, useState } from "react";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { useRef } from 'react';
+
+const Header = ({ }) => {
+  useEffect(() => {
+      require("bootstrap/dist/js/bootstrap.bundle.min.js");
+  }, []);
+
+  const [activeItem, setActiveItem] = useState('booking');
+  
+  const handleItemClick = (section: SetStateAction<string>) => {
+    setActiveItem(section);
+  };
+
+  return (
+    <div>
+    <nav className="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+      <div className="container">
+        <a className="navbar-brand" href="#">
+         Tickets Booking System
+        </a>
+        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className="collapse navbar-collapse" id="navbarNav">
+            <ul className="navbar-nav mr-auto">
+                <li className={`nav-item ${activeItem === 'booking' ? 'active' : ''}`}>
+                    <a className="nav-link" href="#" onClick={() => handleItemClick('booking')}>Booking <span className="sr-only">(current)</span></a>
+                </li>
+                <li className={`nav-item ${activeItem === 'detail' ? 'active' : ''}`}>
+                    <a className="nav-link" href="#" onClick={() => handleItemClick('detail')}>Detail</a>
+                </li>
+            </ul>
+            <span className="navbar-text">
+            <button className="btn btn-danger" onClick={() => ''}>Logout</button>
+            </span> 
+        </div>
+      </div>
+    </nav>
+    </div>
+  );
+};
+
+export default Header;
