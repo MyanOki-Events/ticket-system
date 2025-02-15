@@ -1,13 +1,17 @@
-class User {
-    id: string // Unique Id that is generated from firestore
+export class User {
+    userId: string // Unique Id that is generated from firestore
     name: string
     email: string
+    created: any
+    updated: any
     role: number
 
-    constructor(id: string,name: string, email: string, role: number = 0) {
-        this.id = id
+    constructor(userId: string,name: string, email: string, created: any, updated: any, role: number = 0) {
+        this.userId = userId
         this.name = name
         this.email = email
+        this.created = created
+        this.updated = updated
         this.role = role
     }
 }
