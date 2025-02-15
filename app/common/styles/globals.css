@@ -40,8 +40,3 @@ body {
   .btn-delete:hover {
     background: darkred;
   }
-  
-  .ticket-card:hover {
-    transform: translateY(-5px); /* Lift the card slightly on hover */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* Enhance the shadow on hover */
-  }

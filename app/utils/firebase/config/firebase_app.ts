@@ -1,4 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
+import { GoogleAuthProvider } from "firebase/auth";
 
 // Your Firebase Config (Get this from Firebase Console -> Project Settings)
 const firebaseConfig = {
@@ -14,5 +15,7 @@ const firebaseConfig = {
 
 // Initialize Firebase (Check to prevent re-initialization)
 const iniApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+//const auth = getAuth(iniApp);
+const provider = new GoogleAuthProvider();
 
-export { iniApp }
+export { iniApp , provider }
