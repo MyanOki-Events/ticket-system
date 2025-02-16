@@ -7,24 +7,28 @@ import { addNewTickets } from "../services/ticket_service";
 import { User } from "../dao/user";
 // import { addRealTimeData } from "../utils/firebase/if/firebase_realtime_db_if";
 
-//import { useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { useRouter } from 'next/navigation';
 
 const AdminPage = () => {
-  //   const { data: session } = useSession();
-
-  //   if (!session || session.user.email !== "admin@example.com") {
-  //     return <p>You need to be an admin to view this page.</p>;
-  //   }
+  const { data: session } = useSession();
+  const router = useRouter();
 
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
+    if (!session || session.user?.email !== "myanmarokinawaevents@gmail.com") {
+      router.push('/');
+    } else {
+      console.log('Admin is using');
+      router.push('/admin');
+    }
     getAllUsers()
       .then((data) => {
         setUsers(data)
       })
       .catch((error) => console.log(error))
-  })
+  }, [session]);
 
   const handleClick = async (userId: string) => {
     // addRealTimeData(userId)

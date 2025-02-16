@@ -1,15 +1,19 @@
 "use client";
 
-import { useState, useRef } from 'react'
+import { useState,useEffect, useRef } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { Modal, Button, Form } from 'react-bootstrap';
 import '../../common/styles/globals.css';
+import { useSession } from "next-auth/react";
+import { useRouter } from 'next/navigation';
 
 const TicketsPage = () => {
   const [ticketCount, setTicketCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
+  const { data: session } = useSession();
+  const router = useRouter();
 
   const handleReset = () => {
     setTicketCount(0);
@@ -29,6 +33,13 @@ const TicketsPage = () => {
     setShowModal(false);
     handleReset();
   };
+
+    useEffect(() => {
+      if (!session || session.user?.email == "myanmarokinawaevents@gmail.com") {
+        router.push('/admin');
+      }
+    }, [session]);
+  
 
   return (
     <><div ><Header /></div>
