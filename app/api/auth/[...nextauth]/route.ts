@@ -54,13 +54,13 @@ function nextAuthOptions(req: NextApiRequest): NextAuthOptions {
     events: {
         // These are for audit log
         async signIn(message) { 
-            console.log('SignIn Method : ' + message);
+            console.log('Sucessful Sign In : ' + message.user.name);
          },
         async signOut(message) { 
-            console.log('SignOut Method : ' + message);
+            console.log('Sucessful Sign Out : ');
          },
         async session(message) { 
-            console.log('Session Active : ' + message);
+            console.log('Session Active : ');
         },
       }
     

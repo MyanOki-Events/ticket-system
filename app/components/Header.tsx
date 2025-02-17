@@ -2,6 +2,7 @@
 import { SetStateAction, useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useRef } from 'react';
+import { signOut } from "next-auth/react";
 
 const Header = ({ }) => {
   useEffect(() => {
@@ -12,6 +13,10 @@ const Header = ({ }) => {
   
   const handleItemClick = (section: SetStateAction<string>) => {
     setActiveItem(section);
+  };
+
+  const handleLogout = () => {
+    signOut({ callbackUrl: "/" }); // Redirect to home page after logout
   };
 
   return (
@@ -27,14 +32,14 @@ const Header = ({ }) => {
         <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav mr-auto">
                 <li className={`nav-item ${activeItem === 'booking' ? 'active' : ''}`}>
-                    <a className="nav-link" href="#" onClick={() => handleItemClick('booking')}>Booking <span className="sr-only">(current)</span></a>
+                    <a className="nav-link" href="/tickets/booking" onClick={() => handleItemClick('booking')}>Booking <span className="sr-only">(current)</span></a>
                 </li>
                 <li className={`nav-item ${activeItem === 'detail' ? 'active' : ''}`}>
-                    <a className="nav-link" href="#" onClick={() => handleItemClick('detail')}>Detail</a>
+                    <a className="nav-link" href="/tickets/detail" onClick={() => handleItemClick('detail')}>Detail</a>
                 </li>
             </ul>
-            <span className="navbar-text">
-            <button className="btn btn-danger" onClick={() => ''}>Logout</button>
+            <span className="navbar-text ms-auto">
+            <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
             </span> 
         </div>
       </div>
