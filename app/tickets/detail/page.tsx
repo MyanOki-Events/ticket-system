@@ -12,9 +12,9 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const TicketsPage = () =>  {
   const [tickets, setTickets] = useState([
-    { id: 1, title: 'Concert Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg' },
-    { id: 2, title: 'Concert Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg' },
-    { id: 3, title: 'Concert Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg' },
+    { id: 1, title: 'David Lai Concert Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg', paid: '1' },
+    { id: 2, title: 'Water Festival Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg', paid: '1'  },
+    { id: 3, title: 'Thadingyut Festival Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg', paid: ''  },
   ]);
   const [showModal, setShowModal] = useState(false);
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
@@ -36,37 +36,73 @@ const TicketsPage = () =>  {
       <div className="row">
         {tickets.map(ticket => (
           <div key={ticket.id} className="col-12 mb-4">
-            <div className="card shadow ticket-card" style={{ position: 'relative', userSelect: 'none' }}>
+            <div className="card shadow-lg rounded-3 ticket-card" style={{ position: 'relative', userSelect: 'none', overflow: 'hidden' }}>
               <div className="d-flex justify-content-between align-items-center p-2">
-                <span className="ticket-title">{ticket.title}</span>
+                <span className="beautiful-header text-dark" style={{ fontSize: '20px'}}>{ticket.title} ({ticket.id})</span>
                 <button className="btn btn-delete" onClick={() => handleButtonClick(ticket.id)}>
                   Delete <i className="bi bi-trash"></i>
                 </button>
               </div>
+              <hr className="styled-hr"/>
               <div className="row g-0">
-                <div className="col-md-4">
-                    <img
-                      src={ticket.image}
-                      alt={ticket.title}
-                      className="img-fluid rounded-start"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onTouchStart={(e) => e.preventDefault()}
-                    />
+                <div className="col-md-4 d-flex justify-content-center align-items-center">
+                  <img
+                    src={ticket.image}
+                    alt={ticket.title}
+                    className="img-fluid rounded-start"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onTouchStart={(e) => e.preventDefault()}
+                    style={{ maxHeight: '250px', objectFit: 'cover' }}
+                  />
                 </div>
-                <div className="col-md-4">
+
+                <div className="col-md-4 d-flex">
                   <div className="card-body">
-                    <p className="card-text">{ticket.description}</p>
-                    <p className="card-text"><small className="text-muted">{ticket.date}</small></p>
+                    <h5 className="card-title text-center" 
+                      style={{ fontWeight: 'bold', 
+                             color: '#2c3e50' ,
+                              fontSize: '15px'}}>
+                      Water Festival
+                    </h5>
+                    <table className="table table-bordered table-hover" style={{ border: '2px solid #3498db', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+                      <tbody>
+                        <tr>
+                          <td><strong>Date:</strong> 20th October 2025</td>
+                          <td><strong>Place:</strong> Thadingyut Event Hall, Yangon</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Time:</strong> 10:00 AM - 4:00 PM</td>
+                          <td><strong>Address:</strong> 123 Festival Street, Yangon</td>
+                        </tr>
+                        <tr>
+                          <td colSpan={2} className="text-center">
+                            <strong>Status: </strong> 
+                            {ticket.paid ? (
+                              <span className="text-success" style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                                <i className="bi bi-check-circle-fill" style={{ fontSize: '18px' }}></i> Paid
+                              </span>
+                            ) : (
+                              <span className="text-danger" style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                                <i className="bi bi-x-circle-fill" style={{ fontSize: '18px' }}></i> Not Paid
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
-                <div className="col-md-4">
-                    <img
-                      src={ticket.qrCode}
-                      alt="QR Code"
-                      className="img-fluid rounded-start"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onTouchStart={(e) => e.preventDefault()}
-                    />
+
+                {/* QR Code Section */}
+                <div className="col-md-4 d-flex">
+                  <img
+                    src={ticket.qrCode}
+                    alt="QR Code"
+                    className="img-fluid rounded-end"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onTouchStart={(e) => e.preventDefault()}
+                    style={{ maxHeight: '250px', objectFit: 'cover' }}
+                  />
                 </div>
               </div>
             </div>
@@ -75,28 +111,34 @@ const TicketsPage = () =>  {
       </div>
 
       {/* Modal for Delete Confirmation */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title className="text-dark">Confirm Delete</Modal.Title>
+      <Modal 
+        show={showModal} 
+        onHide={() => setShowModal(false)} 
+        centered 
+        size="lg" 
+        backdrop="static"
+        >
+        <Modal.Header closeButton className="bg-primary text-white">
+          <Modal.Title style={{ fontSize: '18px' }}>Confirm Your Purchase</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <p className="text-dark">
-            Are you sure you want to delete this ticket?
+        <Modal.Body className="bg-light py-4 px-5">
+          <p className="text-dark mb-2" style={{ fontSize: '16px' }}>
+          Are you sure you want to delete this ticket?
           </p>
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer className="bg-light py-3">
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             Cancel
           </Button>
           <Button variant="danger" onClick={() => handleDelete(selectedTicketId as number)}>
-            Delete
+            Confirm
           </Button>
         </Modal.Footer>
       </Modal>
     </div>
-    <div>
-      <Footer />
-    </div></>
+  <div>
+  <Footer />
+  </div></>
   );
 };
 

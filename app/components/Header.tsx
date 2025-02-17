@@ -1,22 +1,32 @@
-//import { signOut } from 'next-auth/react';
+"use-client"
+
 import { SetStateAction, useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useRef } from 'react';
-import { signOut } from "next-auth/react";
+import { signOut, useSession} from "next-auth/react";
+import '../common/styles/globals.css';
+import { usePathname } from 'next/navigation';
 
 const Header = ({ }) => {
+  const [activeItem, setActiveItem] = useState('booking');
+  const { data: session } = useSession();
+  const pathname = usePathname(); 
+
   useEffect(() => {
       require("bootstrap/dist/js/bootstrap.bundle.min.js");
-  }, []);
+      if (pathname === '/tickets/booking') {
+        setActiveItem('booking');
+      } else if (pathname === '/tickets/detail') {
+        setActiveItem('detail');
+      }
+  }, [pathname]);
 
-  const [activeItem, setActiveItem] = useState('booking');
   
   const handleItemClick = (section: SetStateAction<string>) => {
     setActiveItem(section);
   };
 
   const handleLogout = () => {
-    signOut({ callbackUrl: "/" }); // Redirect to home page after logout
+    signOut({ callbackUrl: "/" }); 
   };
 
   return (
@@ -32,14 +42,19 @@ const Header = ({ }) => {
         <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav mr-auto">
                 <li className={`nav-item ${activeItem === 'booking' ? 'active' : ''}`}>
-                    <a className="nav-link" href="/tickets/booking" onClick={() => handleItemClick('booking')}>Booking <span className="sr-only">(current)</span></a>
+                    <a className="nav-link" href="/tickets/booking" onClick={() => handleItemClick('booking')}>Booking<span className="sr-only">(current)</span></a>
                 </li>
                 <li className={`nav-item ${activeItem === 'detail' ? 'active' : ''}`}>
                     <a className="nav-link" href="/tickets/detail" onClick={() => handleItemClick('detail')}>Detail</a>
                 </li>
             </ul>
             <span className="navbar-text ms-auto">
-            <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
+            {session &&
+                <>
+                  <span className="text-white me-3" style={{ fontSize: '14px' }}>{session.user?.name}</span>
+                  <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
+                </>
+            }
             </span> 
         </div>
       </div>

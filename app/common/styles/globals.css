@@ -40,3 +40,23 @@ body {
   .btn-delete:hover {
     background: darkred;
   }
+
+  .styled-hr {
+    border: none; /* Remove default border */
+    height: 1px; /* Set height to control thickness */
+    background: #000; /* Gradient background */
+    margin: 0; /* Remove any space above or below */
+    border-radius: 5px; /* Optional: rounded corners for the line */
+  }
+  .nav-item.active .nav-link {
+    font-weight: bold;
+    color: #ffcc00; /* Change this to your desired active color */
+  }
+  
+  /* Adjust styling for mobile devices */
+  @media (max-width: 768px) {
+    .styled-hr {
+      height: 1.5px; /* Increase thickness for mobile devices */
+      margin: 10px 0; /* Add a little spacing for mobile devices */
+    }
+  }
