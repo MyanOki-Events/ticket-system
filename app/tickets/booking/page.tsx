@@ -1,6 +1,6 @@
 "use client";
 
-import { useState,useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
@@ -8,6 +8,8 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import '../../common/styles/globals.css';
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/navigation';
+import { getUserByEmail } from '@/app/services/user_service';
+import { User } from '@/app/dao/user';
 
 const TicketsPage = () => {
   const [ticketCount, setTicketCount] = useState(0);
@@ -34,200 +36,216 @@ const TicketsPage = () => {
     handleReset();
   };
 
-    useEffect(() => {
-      if (!session || session.user?.email !== "myanmarokinawaevents@gmail.com") {
-        router.push('/tickets/booking');
-      }
-    }, [session]);
-  
+  useEffect(() => {
+    if (!session || !(session.user?.email)) {
+      router.push("/")
+    } else {
+      let email: string = session.user.email
+      getUserByEmail(email)
+        .then((result) => {
+          const user: User = result as User
+          if (user) {
+            if (user.role === 99) {
+              router.push("/admin")
+            } else {
+              router.push("/tickets/booking")
+            }
+          } else {
+            router.push("/")
+          }
+        })
+        .catch((error) => console.log(error))
+    }
+  }, [session]);
+
 
   return (
     <><div ><Header /></div>
-    <div className="container" style={{ padding: '20px' , backgroundColor: '#f8f9fa'}}>
-      <h3 className="text-center" style={{ paddingTop: '60px', color : '#2a9d8f'}}>List of Available Tickets</h3>
-      <div className="row mt-4">
-        <div className="col-md-6 offset-md-3">
-          <div className="card shadow">
-            <div className="card-body text-center">
-              <h6 className="card-title">David Lai Concert Admission Ticket</h6>
-              <div className="mt-4 mb-4">
-                <div className="d-flex flex-column align-items-center">
-                  <div className="d-flex align-items-center mb-3">
-                    <i className="bi bi-calendar-event text-primary me-3" style={{ fontSize: '24px' }}></i>
-                    <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
-                      20th October 2025
-                    </p>
-                  </div>
-                  <div className="d-flex align-items-center mb-3" style={{ lineHeight: '1' }}>
-                    <i className="bi bi-clock text-warning me-3" style={{ fontSize: '24px' }}></i>
-                    <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
-                      10:00 AM - 4:00 PM
-                    </p>
-                  </div>
-                  <div className="d-flex align-items-center" style={{ lineHeight: '1' }}>
-                    <i className="bi bi-geo-alt text-success me-3" style={{ fontSize: '24px' }}></i>
-                    <p className="text-muted mb-0" style={{ fontSize: '14px', }}>
-                      Thadingyut Event Hall, Yangon
-                    </p>
+      <div className="container" style={{ padding: '20px', backgroundColor: '#f8f9fa' }}>
+        <h3 className="text-center" style={{ paddingTop: '60px', color: '#2a9d8f' }}>List of Available Tickets</h3>
+        <div className="row mt-4">
+          <div className="col-md-6 offset-md-3">
+            <div className="card shadow">
+              <div className="card-body text-center">
+                <h6 className="card-title">David Lai Concert Admission Ticket</h6>
+                <div className="mt-4 mb-4">
+                  <div className="d-flex flex-column align-items-center">
+                    <div className="d-flex align-items-center mb-3">
+                      <i className="bi bi-calendar-event text-primary me-3" style={{ fontSize: '24px' }}></i>
+                      <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
+                        20th October 2025
+                      </p>
+                    </div>
+                    <div className="d-flex align-items-center mb-3" style={{ lineHeight: '1' }}>
+                      <i className="bi bi-clock text-warning me-3" style={{ fontSize: '24px' }}></i>
+                      <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
+                        10:00 AM - 4:00 PM
+                      </p>
+                    </div>
+                    <div className="d-flex align-items-center" style={{ lineHeight: '1' }}>
+                      <i className="bi bi-geo-alt text-success me-3" style={{ fontSize: '24px' }}></i>
+                      <p className="text-muted mb-0" style={{ fontSize: '14px', }}>
+                        Thadingyut Event Hall, Yangon
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <p className="card-text" style={{ fontSize: '12px'}}><strong>Price per ticket: &#165;2500</strong></p>
-              <div className="input-group">
-                <button
-                  className="btn btn-outline-secondary"
-                  type="button"
-                  onClick={() => setTicketCount(Math.max(0, ticketCount - 1))}
-                >
-                  -
+                <p className="card-text" style={{ fontSize: '12px' }}><strong>Price per ticket: &#165;2500</strong></p>
+                <div className="input-group">
+                  <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    onClick={() => setTicketCount(Math.max(0, ticketCount - 1))}
+                  >
+                    -
+                  </button>
+                  <input
+                    type="text"
+                    className="form-control text-center"
+                    value={ticketCount}
+                    readOnly />
+                  <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    onClick={() => setTicketCount(ticketCount + 1)}
+                  >
+                    +
+                  </button>
+                </div>
+                <button className="btn btn-outline-danger mt-3 me-2" onClick={handleReset}>
+                  Reset
                 </button>
-                <input
-                  type="text"
-                  className="form-control text-center"
-                  value={ticketCount}
-                  readOnly />
-                <button
-                  className="btn btn-outline-secondary"
-                  type="button"
-                  onClick={() => setTicketCount(ticketCount + 1)}
-                >
-                  +
+                <button className="btn btn-primary mt-3" onClick={handlePurchase}>
+                  Purchase
                 </button>
               </div>
-              <button className="btn btn-outline-danger mt-3 me-2" onClick={handleReset}>
-                Reset
-              </button>
-              <button className="btn btn-primary mt-3" onClick={handlePurchase}>
-                Purchase
-              </button>
             </div>
           </div>
         </div>
-      </div>
-      <div className="row mt-4">
-        <div className="col-md-6 offset-md-3">
-          <div className="card shadow">
-            <div className="card-body text-center">
-              <h6 className="card-title">Water Festival Admission Ticket</h6>
-              <div className="mt-4 mb-4">
-                <div className="d-flex flex-column align-items-center">
-                  <div className="d-flex align-items-center mb-3">
-                    <i className="bi bi-calendar-event text-primary me-3" style={{ fontSize: '24px' }}></i>
-                    <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
-                      20th October 2025
-                    </p>
-                  </div>
-                  <div className="d-flex align-items-center mb-3" style={{ lineHeight: '1' }}>
-                    <i className="bi bi-clock text-warning me-3" style={{ fontSize: '24px' }}></i>
-                    <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
-                      10:00 AM - 4:00 PM
-                    </p>
-                  </div>
-                  <div className="d-flex align-items-center" style={{ lineHeight: '1' }}>
-                    <i className="bi bi-geo-alt text-success me-3" style={{ fontSize: '24px' }}></i>
-                    <p className="text-muted mb-0" style={{ fontSize: '14px', }}>
-                      Thadingyut Event Hall, Yangon
-                    </p>
+        <div className="row mt-4">
+          <div className="col-md-6 offset-md-3">
+            <div className="card shadow">
+              <div className="card-body text-center">
+                <h6 className="card-title">Water Festival Admission Ticket</h6>
+                <div className="mt-4 mb-4">
+                  <div className="d-flex flex-column align-items-center">
+                    <div className="d-flex align-items-center mb-3">
+                      <i className="bi bi-calendar-event text-primary me-3" style={{ fontSize: '24px' }}></i>
+                      <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
+                        20th October 2025
+                      </p>
+                    </div>
+                    <div className="d-flex align-items-center mb-3" style={{ lineHeight: '1' }}>
+                      <i className="bi bi-clock text-warning me-3" style={{ fontSize: '24px' }}></i>
+                      <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
+                        10:00 AM - 4:00 PM
+                      </p>
+                    </div>
+                    <div className="d-flex align-items-center" style={{ lineHeight: '1' }}>
+                      <i className="bi bi-geo-alt text-success me-3" style={{ fontSize: '24px' }}></i>
+                      <p className="text-muted mb-0" style={{ fontSize: '14px', }}>
+                        Thadingyut Event Hall, Yangon
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <p className="card-text" style={{ fontSize: '12px'}}><strong>Price per ticket: &#165;2500</strong></p>
-              <div className="input-group">
-                <button
-                  className="btn btn-outline-secondary"
-                  type="button"
-                  onClick={() => setTicketCount(Math.max(0, ticketCount - 1))}
-                >
-                  -
+                <p className="card-text" style={{ fontSize: '12px' }}><strong>Price per ticket: &#165;2500</strong></p>
+                <div className="input-group">
+                  <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    onClick={() => setTicketCount(Math.max(0, ticketCount - 1))}
+                  >
+                    -
+                  </button>
+                  <input
+                    type="text"
+                    className="form-control text-center"
+                    value={ticketCount}
+                    readOnly />
+                  <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    onClick={() => setTicketCount(ticketCount + 1)}
+                  >
+                    +
+                  </button>
+                </div>
+                <button className="btn btn-outline-danger mt-3 me-2" onClick={handleReset}>
+                  Reset
                 </button>
-                <input
-                  type="text"
-                  className="form-control text-center"
-                  value={ticketCount}
-                  readOnly />
-                <button
-                  className="btn btn-outline-secondary"
-                  type="button"
-                  onClick={() => setTicketCount(ticketCount + 1)}
-                >
-                  +
+                <button className="btn btn-primary mt-3" onClick={handlePurchase}>
+                  Purchase
                 </button>
               </div>
-              <button className="btn btn-outline-danger mt-3 me-2" onClick={handleReset}>
-                Reset
-              </button>
-              <button className="btn btn-primary mt-3" onClick={handlePurchase}>
-                Purchase
-              </button>
             </div>
           </div>
         </div>
-      </div>
-      <div className="row mt-4">
-        <div className="col-md-6 offset-md-3">
-          <div className="card shadow">
-            <div className="card-body text-center">
-              <h6 className="card-title">Thadingyut Admission Ticket</h6>
-              <div className="mt-4 mb-4">
-                <div className="d-flex flex-column align-items-center">
-                  <div className="d-flex align-items-center mb-3">
-                    <i className="bi bi-calendar-event text-primary me-3" style={{ fontSize: '24px' }}></i>
-                    <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
-                      20th October 2025
-                    </p>
-                  </div>
-                  <div className="d-flex align-items-center mb-3" style={{ lineHeight: '1' }}>
-                    <i className="bi bi-clock text-warning me-3" style={{ fontSize: '24px' }}></i>
-                    <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
-                      10:00 AM - 4:00 PM
-                    </p>
-                  </div>
-                  <div className="d-flex align-items-center" style={{ lineHeight: '1' }}>
-                    <i className="bi bi-geo-alt text-success me-3" style={{ fontSize: '24px' }}></i>
-                    <p className="text-muted mb-0" style={{ fontSize: '14px', }}>
-                      Thadingyut Event Hall, Yangon
-                    </p>
+        <div className="row mt-4">
+          <div className="col-md-6 offset-md-3">
+            <div className="card shadow">
+              <div className="card-body text-center">
+                <h6 className="card-title">Thadingyut Admission Ticket</h6>
+                <div className="mt-4 mb-4">
+                  <div className="d-flex flex-column align-items-center">
+                    <div className="d-flex align-items-center mb-3">
+                      <i className="bi bi-calendar-event text-primary me-3" style={{ fontSize: '24px' }}></i>
+                      <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
+                        20th October 2025
+                      </p>
+                    </div>
+                    <div className="d-flex align-items-center mb-3" style={{ lineHeight: '1' }}>
+                      <i className="bi bi-clock text-warning me-3" style={{ fontSize: '24px' }}></i>
+                      <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
+                        10:00 AM - 4:00 PM
+                      </p>
+                    </div>
+                    <div className="d-flex align-items-center" style={{ lineHeight: '1' }}>
+                      <i className="bi bi-geo-alt text-success me-3" style={{ fontSize: '24px' }}></i>
+                      <p className="text-muted mb-0" style={{ fontSize: '14px', }}>
+                        Thadingyut Event Hall, Yangon
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <p className="card-text" style={{ fontSize: '12px'}}><strong>Price per ticket: &#165;2500</strong></p>
-              <div className="input-group">
-                <button
-                  className="btn btn-outline-secondary"
-                  type="button"
-                  onClick={() => setTicketCount(Math.max(0, ticketCount - 1))}
-                >
-                  -
+                <p className="card-text" style={{ fontSize: '12px' }}><strong>Price per ticket: &#165;2500</strong></p>
+                <div className="input-group">
+                  <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    onClick={() => setTicketCount(Math.max(0, ticketCount - 1))}
+                  >
+                    -
+                  </button>
+                  <input
+                    type="text"
+                    className="form-control text-center"
+                    value={ticketCount}
+                    readOnly />
+                  <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    onClick={() => setTicketCount(ticketCount + 1)}
+                  >
+                    +
+                  </button>
+                </div>
+                <button className="btn btn-outline-danger mt-3 me-2" onClick={handleReset}>
+                  Reset
                 </button>
-                <input
-                  type="text"
-                  className="form-control text-center"
-                  value={ticketCount}
-                  readOnly />
-                <button
-                  className="btn btn-outline-secondary"
-                  type="button"
-                  onClick={() => setTicketCount(ticketCount + 1)}
-                >
-                  +
+                <button className="btn btn-primary mt-3" onClick={handlePurchase}>
+                  Purchase
                 </button>
               </div>
-              <button className="btn btn-outline-danger mt-3 me-2" onClick={handleReset}>
-                Reset
-              </button>
-              <button className="btn btn-primary mt-3" onClick={handlePurchase}>
-                Purchase
-              </button>
             </div>
           </div>
         </div>
-      </div>
-      {/* Modal for Ticket Purchase Confirmation */}
-        <Modal 
-          show={showModal} 
-          onHide={() => setShowModal(false)} 
-          centered 
-          size="lg" 
+        {/* Modal for Ticket Purchase Confirmation */}
+        <Modal
+          show={showModal}
+          onHide={() => setShowModal(false)}
+          centered
+          size="lg"
           backdrop="static"
         >
           <Modal.Header closeButton className="bg-primary text-white">
@@ -247,10 +265,10 @@ const TicketsPage = () => {
             </div>
             <Form.Group>
               <Form.Label className="text-dark" style={{ fontSize: '14px' }}>Payment Method</Form.Label>
-              <Form.Control 
-                as="select" 
-                value={paymentMethod} 
-                onChange={(e) => setPaymentMethod(e.target.value)} 
+              <Form.Control
+                as="select"
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
                 className="shadow-sm"
                 style={{ fontSize: '14px' }}
               >
@@ -268,8 +286,8 @@ const TicketsPage = () => {
             </Button>
           </Modal.Footer>
         </Modal>
-      <Footer />
-    </div></>
+        <Footer />
+      </div></>
   );
 };
 

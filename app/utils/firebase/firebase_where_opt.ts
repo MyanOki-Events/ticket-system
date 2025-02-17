@@ -1,4 +1,4 @@
-declare enum WhereOpt {
+export enum WhereOpt {
     WHERE_EQUAL = "==",
     WHERE_NOT_EQUAL = "!=",
     WHERE_GREATER_THAN = ">",

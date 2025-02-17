@@ -10,16 +10,18 @@ import {
     query,
     where
 } from "firebase/firestore";
+import { FirebaseWhere } from "../firebase_where";
 
-export const addNewDocument = async (inputData: any, collectionName: string) => {
-    await addDoc(collection(storeDb, collectionName), inputData);
+export const addNewDocument = async (collectionName: string, inputData: any) => {
+    let docRef = await addDoc(collection(storeDb, collectionName), inputData);
+    return docRef.id
 };
 
 export const getDocumentById = async (collectionName: string, id: string) => {
     const docRef = doc(storeDb, collectionName, id);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists())
-        return {id, ...docSnap.data()}
+        return { id, ...docSnap.data() }
     return null
 }
 

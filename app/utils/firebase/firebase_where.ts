@@ -1,4 +1,6 @@
-class FirebaseWhere {
+import { WhereOpt } from "./firebase_where_opt"
+
+export class FirebaseWhere {
     operand: string
     operator: WhereOpt
     value: any

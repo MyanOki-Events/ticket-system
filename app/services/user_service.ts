@@ -1,5 +1,7 @@
 import { User } from "../dao/user";
-import { getDocumentById, getDocumentByWhereClause, getMultipleDocuments } from "../utils/firebase/if/firebase_store_if";
+import { FirebaseWhere } from "../utils/firebase/firebase_where";
+import { WhereOpt } from "../utils/firebase/firebase_where_opt";
+import { getDocumentById, getDocumentByWhereClause, getMultipleDocuments, addNewDocument } from "../utils/firebase/if/firebase_store_if";
 
 export const getAllUsers = async () => {
     let users: User[] = []
@@ -41,4 +43,14 @@ export const getUserByEmail = async (email: string) => {
         console.log(error) // use firebase log trace later
     }
     return {}
+}
+
+export const addNewUser = async (user: User) => {
+    try {
+        const { userId, ...other } = user
+        return await addNewDocument("users", other)
+    } catch (error) {
+        console.log(error)
+    }
+    return ""
 }

@@ -1,3 +1,4 @@
+import { loginProcess } from "@/app/services/login_service";
 import { NextApiRequest, NextApiResponse } from "next";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
@@ -42,12 +43,14 @@ function nextAuthOptions(req: NextApiRequest): NextAuthOptions {
         return session;
       },
       async signIn({ user, account, profile, email, credentials }) {
-        console.log('User ' + JSON.stringify(user, null ,2));
+        // console.log('User SignIn + ' + JSON.stringify(user));
+        // console.log('User SignIn - ' + JSON.stringify(user, null ,2));
         // Ensure the user has a Gmail email
         if (!user.email?.endsWith('@gmail.com')) {
             return false; // Reject non-Gmail users
         }
         // You can add further logic here if needed (e.g., reject non-admin users)
+        loginProcess(user)
         return true;
       },
     },
