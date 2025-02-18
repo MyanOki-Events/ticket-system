@@ -10,6 +10,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from 'next/navigation';
 import { getUserByEmail } from '@/app/services/user_service';
 import { User } from '@/app/dao/user';
+import { addNewTickets} from "@/app/services/ticket_service";
 
 const TicketsPage = () => {
   const [ticketCount, setTicketCount] = useState(0);
@@ -29,11 +30,17 @@ const TicketsPage = () => {
   const totalPrice = ticketCount * ticketPrice;
 
   const [paymentMethod, setPaymentMethod] = useState('Bank Transfer');
-
-  const handleConfirmPurchase = () => {
-    alert(`You have purchased ${ticketCount} tickets!`);
-    setShowModal(false);
-    handleReset();
+  const [userId, setUserId] = useState('');
+  const handleConfirmPurchase = async (ticketCount : number) => {
+    try {
+      await addNewTickets(userId,ticketCount);
+      router.push(`/tickets/detail?userId=${userId}`);
+    } catch (error) {
+      console.error("Error while adding tickets:", error);
+    } finally {
+      setShowModal(false);
+      handleReset();
+    }
   };
 
   useEffect(() => {
@@ -44,6 +51,7 @@ const TicketsPage = () => {
       getUserByEmail(email)
         .then((result) => {
           const user: User = result as User
+          setUserId(user.userId)
           if (user) {
             if (user.role === 99) {
               router.push("/admin")
@@ -281,7 +289,7 @@ const TicketsPage = () => {
             <Button variant="secondary" onClick={() => setShowModal(false)}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={handleConfirmPurchase}>
+            <Button variant="primary" onClick={async () => await handleConfirmPurchase(ticketCount)}>
               Confirm
             </Button>
           </Modal.Footer>

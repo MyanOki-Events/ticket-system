@@ -35,6 +35,14 @@ const Header = ({ }) => {
       <div className="container">
         <a className="navbar-brand" href="#">
          Tickets Booking System
+         {session && 
+          <>
+          <span className="d-block d-sm-none" style={{ fontSize: '10px', marginTop: '5px' }}>
+            <i className="bi bi-person-circle me-2" style={{ fontSize: '10px' }}></i>
+              {session.user?.name}
+          </span>
+          </>
+         }
         </a>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
@@ -42,20 +50,30 @@ const Header = ({ }) => {
         <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav mr-auto">
                 <li className={`nav-item ${activeItem === 'booking' ? 'active' : ''}`}>
-                    <a className="nav-link" href="/tickets/booking" onClick={() => handleItemClick('booking')}>Booking<span className="sr-only">(current)</span></a>
+                    <a className="nav-link" href="/tickets/booking" onClick={() => handleItemClick('booking')}>Booking</a>
                 </li>
                 <li className={`nav-item ${activeItem === 'detail' ? 'active' : ''}`}>
                     <a className="nav-link" href="/tickets/detail" onClick={() => handleItemClick('detail')}>Detail</a>
                 </li>
+                <li className={`nav-item ${activeItem === 'admin' ? 'active' : ''}`}>
+                    <a className="nav-link" href="/admin" onClick={() => handleItemClick('admin')}>Admin Dashboard</a>
+                </li>
             </ul>
-            <span className="navbar-text ms-auto">
-            {session &&
+            <div className="d-flex ms-auto align-items-center">
+              {session && (
                 <>
-                  <span className="text-white me-3" style={{ fontSize: '14px' }}>{session.user?.name}</span>
-                  <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
+                  {/* Show username only on larger screens */}
+                  <span className="d-none d-sm-block text-white me-3" style={{ fontSize: '14px' }}>
+                    <i className="bi bi-person-circle me-2" style={{ fontSize: '16px' }}></i>
+                    {session.user?.name}
+                  </span>
+                  {/* Ensure Logout button is always at the end */}
+                  <button className="btn btn-danger" onClick={handleLogout}>
+                    Logout
+                  </button>
                 </>
-            }
-            </span> 
+              )}
+            </div>
         </div>
       </div>
     </nav>

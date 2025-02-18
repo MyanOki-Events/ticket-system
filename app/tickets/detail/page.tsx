@@ -1,7 +1,7 @@
 "use client";
 
-//import { useSession } from "next-auth/react";
-import { useState, useRef, SetStateAction } from 'react'
+import { useSession } from "next-auth/react";
+import { useState, useEffect,useCallback, SetStateAction } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
@@ -9,18 +9,25 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import styles from "./login.module.css"; // Import the CSS module
 import '../../common/styles/globals.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import { deleteTicketByIds, getTicketsByUserId} from "@/app/services/ticket_service";
+import Ticket from "../../dao/ticket";
+import { QRCodeCanvas } from 'qrcode.react';
+import { useSearchParams } from 'next/navigation';
 
 const TicketsPage = () =>  {
-  const [tickets, setTickets] = useState([
-    { id: 1, title: 'David Lai Concert Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg', paid: '1' },
-    { id: 2, title: 'Water Festival Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg', paid: '1'  },
-    { id: 3, title: 'Thadingyut Festival Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg', paid: ''  },
-  ]);
+  // const [tickets, setTickets] = useState([
+  //   { id: 1, title: 'David Lai Concert Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg', paid: '1' },
+  //   { id: 2, title: 'Water Festival Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg', paid: '1'  },
+  //   { id: 3, title: 'Thadingyut Festival Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg', paid: ''  },
+  // ]);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
+  const searchParams = useSearchParams();
+  const userId = searchParams.get('userId') as string; 
 
   const handleDelete = (id: number) => {
-    setTickets(tickets.filter(ticket => ticket.id !== id));
+    //setTickets(tickets.filter(ticket => ticket. !== id));
     setShowModal(false);
   };
 
@@ -29,17 +36,35 @@ const TicketsPage = () =>  {
     setShowModal(true);
   };
 
+  const _getTicketsByUserId = useCallback(async () => {
+    await getTicketsByUserId(userId, (res) => {
+      if (res) {
+        const usersArray = Object.entries(res).map(([key, value]) => ({
+          ticketId: key,
+          ...(value as any),
+        }));
+        setTickets(usersArray as Ticket[])
+      } else {
+        setTickets([])
+      }
+    }) 
+  }, [])
+
+  useEffect(() => {
+    _getTicketsByUserId()
+  }, [_getTicketsByUserId])
+  
   return (
     <><div ><Header /></div>
     <div className="container" style={{ padding: '20px', backgroundColor: '#f8f9fa' }}>
       <h3 className="text-center" style={{ paddingTop: '60px', color: '#2a9d8f' }}>List of Purchased Tickets</h3>
       <div className="row">
-        {tickets.map(ticket => (
-          <div key={ticket.id} className="col-12 mb-4">
+        {tickets.map((ticket, index) => (
+          <div key={index+1} className="col-12 mb-4">
             <div className="card shadow-lg rounded-3 ticket-card" style={{ position: 'relative', userSelect: 'none', overflow: 'hidden' }}>
               <div className="d-flex justify-content-between align-items-center p-2">
-                <span className="beautiful-header text-dark" style={{ fontSize: '20px'}}>{ticket.title} ({ticket.id})</span>
-                <button className="btn btn-delete" onClick={() => handleButtonClick(ticket.id)}>
+                <span className="beautiful-header text-dark" style={{ fontSize: '20px'}}>{ticket.ticketType} ({index+1})</span>
+                <button className="btn btn-delete" onClick={() => handleButtonClick(index+1)}>
                   Delete <i className="bi bi-trash"></i>
                 </button>
               </div>
@@ -47,8 +72,9 @@ const TicketsPage = () =>  {
               <div className="row g-0">
                 <div className="col-md-4 d-flex justify-content-center align-items-center">
                   <img
-                    src={ticket.image}
-                    alt={ticket.title}
+                    //src={ticket.image}
+                    src="/ticket_sample.jpg"
+                    alt={ticket.ticketType}
                     className="img-fluid rounded-start"
                     onMouseDown={(e) => e.preventDefault()}
                     onTouchStart={(e) => e.preventDefault()}
@@ -77,7 +103,7 @@ const TicketsPage = () =>  {
                         <tr>
                           <td colSpan={2} className="text-center">
                             <strong>Status: </strong> 
-                            {ticket.paid ? (
+                            {ticket.isPaid ? (
                               <span className="text-success" style={{ fontSize: '16px', fontWeight: 'bold' }}>
                                 <i className="bi bi-check-circle-fill" style={{ fontSize: '18px' }}></i> Paid
                               </span>
@@ -94,22 +120,17 @@ const TicketsPage = () =>  {
                 </div>
 
                 {/* QR Code Section */}
-                <div className="col-md-4 d-flex">
-                  <img
-                    src={ticket.qrCode}
-                    alt="QR Code"
-                    className="img-fluid rounded-end"
-                    onMouseDown={(e) => e.preventDefault()}
-                    onTouchStart={(e) => e.preventDefault()}
-                    style={{ maxHeight: '250px', objectFit: 'cover' }}
-                  />
+                <div className="col-md-4 d-flex justify-content-center">
+                  <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                    <p style={{ fontSize: '14px', fontWeight: 'bold', color: '#333' }}>QR Scan</p>
+                      <QRCodeCanvas value={ticket.ticketId} size={150} />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         ))}
       </div>
-
       {/* Modal for Delete Confirmation */}
       <Modal 
         show={showModal} 
