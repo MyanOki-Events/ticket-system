@@ -15,6 +15,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import { useSearchParams } from 'next/navigation';
 
 const PageContent = () => {
+  const baseUrl:string = process.env.NEXT_PUBLIC_BASE_URL
   // const [tickets, setTickets] = useState([
   //   { id: 1, title: 'David Lai Concert Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg', paid: '1' },
   //   { id: 2, title: 'Water Festival Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg', paid: '1'  },
@@ -125,7 +126,7 @@ const PageContent = () => {
                   <div className="col-md-4 d-flex justify-content-center">
                     <div style={{ textAlign: 'center', marginTop: '20px' }}>
                       <p style={{ fontSize: '14px', fontWeight: 'bold', color: '#333' }}>QR Scan</p>
-                      <QRCodeCanvas value={ticket.ticketId} size={150} />
+                      <QRCodeCanvas value={`${baseUrl}/admin/qrcode_ticket?userId=${ticket.userId}&ticketId=${ticket.ticketId}`} size={150} />
                     </div>
                   </div>
                 </div>

@@ -15,6 +15,11 @@ const getTicketsByUserId = async (userId: string, callback: (data: any) => void)
     readRealTimeData(path, callback)
 }
 
+const getTicketsByUserIdAndTicketId = async (userId: string, ticketId: string, callback: (data: any) => void) => {
+    const path: string = `users/${userId}/tickets/${ticketId}`
+    readRealTimeData(path, callback)
+}
+
 const deleteTicketByIds = async (userId: string, ticketId: string) => {
     const path: string = `users/${userId}/tickets/${ticketId}`
     await deleteRealTimeData(path)
@@ -22,7 +27,9 @@ const deleteTicketByIds = async (userId: string, ticketId: string) => {
 
 const updateTicketByIds = async (userId: string, ticketId: string, data: any) => {
     const path: string = `users/${userId}/tickets/${ticketId}`
-    await updateRealTimeData(path, data)
+    const updated = serverTimestamp()
+    const other = {"updated" : updated, ...data}
+    await updateRealTimeData(path, other)
 }
 
-export { addNewTickets, getTicketsByUserId, deleteTicketByIds, updateTicketByIds }
+export { addNewTickets, getTicketsByUserId, deleteTicketByIds, updateTicketByIds, getTicketsByUserIdAndTicketId }
