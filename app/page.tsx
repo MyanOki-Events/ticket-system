@@ -29,13 +29,15 @@ const LoginPage = () => {
 
     // setError(""); // Clear any previous error
 
-    await signIn("google", { callbackUrl: "/tickets/booking" , 
-      // authorization : {
-      //   params : {
-      //     login_hint : email 
-      //   }
-      // }
-    }); 
+    // TODO: reconsider
+    // await signIn("google", { callbackUrl: "/tickets/booking" , 
+    //   // authorization : {
+    //   //   params : {
+    //   //     login_hint : email 
+    //   //   }
+    //   // }
+    // }); 
+    router.push('/tickets/booking');
   };
 
   // Function to validate email
