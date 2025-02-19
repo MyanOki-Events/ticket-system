@@ -55,9 +55,10 @@ const TicketsPage = () => {
           if (user) {
             if (user.role === 99) {
               router.push("/admin")
-            } else {
-              router.push("/tickets/booking")
-            }
+            } 
+            // else {
+            //   router.push("/tickets/booking")
+            // }
           } else {
             router.push("/")
           }
