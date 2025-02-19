@@ -35,7 +35,7 @@ const TicketsPage = () => {
     try {
       await addNewTickets(userId,ticketCount);
       // TODO: reconsider
-      //router.push(`/tickets/detail?userId=${userId}`);
+      router.push(`/tickets/detail?userId=${userId}`);
     } catch (error) {
       console.error("Error while adding tickets:", error);
     } finally {
@@ -50,7 +50,9 @@ const TicketsPage = () => {
       //router.push("/")
     } else {
       let email: string = session.user.email
-      getUserByEmail(email)
+      //getUserByEmail(email)
+      // TODO delete in future
+      getUserByEmail('myanmarokinawaevents@gmail.com')
         .then((result) => {
           const user: User = result as User
           setUserId(user.userId)
