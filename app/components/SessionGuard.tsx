@@ -12,10 +12,11 @@ export default function SessionGuard({ children }: { children: ReactNode }) {
       if (status === "loading") return;
   
       // If there's no session (meaning user is not logged in), sign in
-      if (!session) {
-        //signIn("google");  // Trigger sign-in using Google provider
-        router.push('/');
-      }
+      // TODO: reconsider
+      // if (!session) {
+      //   //signIn("google");  // Trigger sign-in using Google provider
+      //   router.push('/');
+      // }
     }, [session, status]);  // Re-run effect when session or status changes
   
     return <>{children}</>;  // Render children if session is valid

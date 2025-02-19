@@ -34,7 +34,8 @@ const TicketsPage = () => {
   const handleConfirmPurchase = async (ticketCount : number) => {
     try {
       await addNewTickets(userId,ticketCount);
-      router.push(`/tickets/detail?userId=${userId}`);
+      // TODO: reconsider
+      //router.push(`/tickets/detail?userId=${userId}`);
     } catch (error) {
       console.error("Error while adding tickets:", error);
     } finally {
@@ -45,7 +46,8 @@ const TicketsPage = () => {
 
   useEffect(() => {
     if (!session || !(session.user?.email)) {
-      router.push("/")
+      // TODO: reconsider
+      //router.push("/")
     } else {
       let email: string = session.user.email
       getUserByEmail(email)
@@ -54,13 +56,15 @@ const TicketsPage = () => {
           setUserId(user.userId)
           if (user) {
             if (user.role === 99) {
-              router.push("/admin")
+              // TODO: reconsider
+              //router.push("/admin")
             } 
             // else {
             //   router.push("/tickets/booking")
             // }
           } else {
-            router.push("/")
+            // TODO: reconsider
+            //router.push("/")
           }
         })
         .catch((error) => console.log(error))
