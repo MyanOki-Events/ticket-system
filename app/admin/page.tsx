@@ -17,12 +17,12 @@ const AdminPage = () => {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    if (!session || session.user?.email !== "myanmarokinawaevents@gmail.com") {
-      router.push('/');
-    } else {
-      console.log('Admin is using');
-      router.push('/admin');
-    }
+    // if (!session || session.user?.email !== "myanmarokinawaevents@gmail.com") {
+    //   router.push('/');
+    // } else {
+    //   console.log('Admin is using');
+    //   router.push('/admin');
+    // }
     getAllUsers()
       .then((data) => {
         setUsers(data)
