@@ -6,7 +6,7 @@ import GoogleProvider from "next-auth/providers/google";
 const adminEmails = ['myanmarokinawaevents@gmail.com'];
 
 // NextAuth configuration
-function nextAuthOptions(req: NextApiRequest): NextAuthOptions {
+function nextAuthOptions(): NextAuthOptions {
   return {
     providers: [
         GoogleProvider({
@@ -71,10 +71,13 @@ function nextAuthOptions(req: NextApiRequest): NextAuthOptions {
   }
   
 
-export const GET = (req: NextApiRequest, res: NextApiResponse) => {
-  return NextAuth(req, res, nextAuthOptions(req));
-};
+// export const GET = (req: NextApiRequest, res: NextApiResponse) => {
+//   return NextAuth(req, res, nextAuthOptions(req));
+// };
 
-export const POST = (req: NextApiRequest, res: NextApiResponse) => {
-  return NextAuth(req, res, nextAuthOptions(req));
-};
+// export const POST = (req: NextApiRequest, res: NextApiResponse) => {
+//   return NextAuth(req, res, nextAuthOptions(req));
+// };
+
+const handler = NextAuth(nextAuthOptions());
+export { handler as GET, handler as POST };
