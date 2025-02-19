@@ -15,7 +15,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import { useSearchParams } from 'next/navigation';
 
 const PageContent = () => {
-  const baseUrl:string = process.env.NEXT_PUBLIC_BASE_URL
+  const baseUrl:string = process.env.NEXT_PUBLIC_BASE_URL!
   // const [tickets, setTickets] = useState([
   //   { id: 1, title: 'David Lai Concert Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg', paid: '1' },
   //   { id: 2, title: 'Water Festival Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg', paid: '1'  },
