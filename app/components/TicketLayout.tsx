@@ -11,6 +11,7 @@ const TicketLayout = ({ userId }: { userId: string }) => {
     await getTicketsByUserId(userId, (res) => {
       if (res) {
         const usersArray = Object.entries(res).map(([key, value]) => ({
+          userId: userId,
           ticketId: key,
           ...(value as any),
         }));
@@ -29,9 +30,9 @@ const TicketLayout = ({ userId }: { userId: string }) => {
     await deleteTicketByIds(userId, ticketId)
   }
 
-  const updatePaidState = async (ticketId: string, flag: boolean) => { 
-    updateTicketByIds(userId, ticketId, { "isPaid" : flag })
-   }
+  const updatePaidState = async (ticketId: string, flag: boolean) => {
+    updateTicketByIds(userId, ticketId, { "isPaid": flag })
+  }
 
   return (
     <div>

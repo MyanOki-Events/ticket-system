@@ -18,7 +18,7 @@ const PageContent = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
-  const baseUrl: string = process.env.NEXT_PUBLIC_BASE_URL ?? ""
+  const baseUrl: string = process.env.NEXTAUTH_URL ?? ""
 
   const handleDelete = (id: number) => {
     setShowModal(false);
@@ -33,6 +33,7 @@ const PageContent = () => {
     await getTicketsByUserId(userId, (res) => {
       if (res) {
         const usersArray = Object.entries(res).map(([key, value]) => ({
+          userId: userId,
           ticketId: key,
           ...(value as any),
         }));
