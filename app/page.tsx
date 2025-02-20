@@ -4,9 +4,9 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./login.module.css";
 import { signIn, useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 
-const LoginPage = () => {
+const LoginForm = () => {
   const { data: session, status } = useSession()
   const searchParams = useSearchParams();
   const router = useRouter()
@@ -63,4 +63,12 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+// export default LoginPage;
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<p>Loading...</p>}> {/* ✅ Suspense to prevent hydration mismatch */}
+      <LoginForm />
+    </Suspense>
+  );
+}
