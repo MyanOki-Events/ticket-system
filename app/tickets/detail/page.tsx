@@ -18,7 +18,7 @@ const PageContent = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
-  const baseUrl: string = process.env.NEXTAUTH_URL ?? ""
+  const baseUrl: string = process.env.NEXT_PUBLIC_BASE_URL ?? ""
 
   const handleDelete = (id: number) => {
     setShowModal(false);
