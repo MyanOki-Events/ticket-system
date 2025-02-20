@@ -1,22 +1,24 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./login.module.css";
 import { signIn, useSession } from "next-auth/react";
 import { useEffect } from "react";
 
 const LoginPage = () => {
   const { data: session, status } = useSession()
+  const searchParams = useSearchParams();
   const router = useRouter()
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   // If already authenticated redirect booking
   useEffect(() => {
     if (status === "authenticated") {
-      if(session.user.role === 99) {
+      if (session.user.role === 99) {
         router.replace("/admin");
       }
-      if(session.user.role === 0) {
+      if (session.user.role === 0) {
         router.replace("/tickets/detail");
       }
     }
@@ -24,7 +26,7 @@ const LoginPage = () => {
 
   // Login Handle
   const handleSignIn = async () => {
-    await signIn("google", { callbackUrl: "/", });
+    await signIn("google", { callbackUrl });
   };
 
   return (
