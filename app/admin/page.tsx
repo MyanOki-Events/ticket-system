@@ -3,26 +3,15 @@
 import { useState, useEffect } from "react";
 import { getAllUsers } from "../services/user_service";
 import Link from "next/link";
-import { addNewTickets } from "../services/ticket_service";
+// import { addNewTickets } from "../services/ticket_service";
 import { User } from "../dao/user";
-// import { addRealTimeData } from "../utils/firebase/if/firebase_realtime_db_if";
-
 import { useSession } from "next-auth/react";
-import { useRouter } from 'next/navigation';
 
 const AdminPage = () => {
   const { data: session } = useSession();
-  const router = useRouter();
-
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    // if (!session || session.user?.email !== "myanmarokinawaevents@gmail.com") {
-    //   router.push('/');
-    // } else {
-    //   console.log('Admin is using');
-    //   router.push('/admin');
-    // }
     getAllUsers()
       .then((data) => {
         setUsers(data)
@@ -30,9 +19,9 @@ const AdminPage = () => {
       .catch((error) => console.log(error))
   }, [session]);
 
+  // TODO: Remove After First Step(first release)
   const handleClick = async (userId: string) => {
-    // addRealTimeData(userId)
-    await addNewTickets(userId)
+    // await addNewTickets(userId)
   }
 
   return (
@@ -56,7 +45,7 @@ const AdminPage = () => {
                   <td>{user.name}</td>
                   <td>{user.email}</td>
                   <td>
-                    <Link href={"admin/member?userId=" + user.userId}>
+                    <Link href={`admin/member/${user.userId}`}>
                       <i className="bi bi-clipboard-data"></i>
                     </Link>
                   </td>

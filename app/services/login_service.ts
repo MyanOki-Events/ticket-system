@@ -9,10 +9,11 @@ export const loginProcess = async (nextUser: nextAuthUser) => {
         if (!retUser || !Object.keys(retUser) || Object.keys(retUser).length === 0) {
             // User doesn't exist, save user to firebase
             const user: daoUser = new daoUser("", nextUser?.name ?? "Undefined User", nextUser.email, serverTimestamp(), "")
-            await addNewUser(user)
-            return;
+            const docId: string = await addNewUser(user)
+            user.userId = docId
+            return user;
         }
-        return;
+        return retUser;
     }
     return;
 }

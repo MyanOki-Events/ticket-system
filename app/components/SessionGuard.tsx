@@ -3,6 +3,7 @@ import { signIn, useSession } from "next-auth/react";
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+// TODO: Remove?
 export default function SessionGuard({ children }: { children: ReactNode }) {
     const { data: session, status } = useSession();  // Get session data and status
     const router = useRouter();

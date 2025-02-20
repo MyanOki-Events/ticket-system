@@ -45,33 +45,39 @@ const TicketsPage = () => {
   };
 
   useEffect(() => {
-    if (!session || !(session.user?.email)) {
-      // TODO: reconsider
-      //router.push("/")
-    } else {
-      let email: string = session.user.email
-      //getUserByEmail(email)
-      // TODO delete in future
-      getUserByEmail('myanmarokinawaevents@gmail.com')
-        .then((result) => {
-          const user: User = result as User
-          setUserId(user.userId)
-          if (user) {
-            if (user.role === 99) {
-              // TODO: reconsider
-              //router.push("/admin")
-            } 
-            // else {
-            //   router.push("/tickets/booking")
-            // }
-          } else {
-            // TODO: reconsider
-            //router.push("/")
-          }
-        })
-        .catch((error) => console.log(error))
+    if(session?.user) {
+      setUserId(session?.user.userId)
     }
-  }, [session]);
+  })
+
+  // useEffect(() => {
+  //   if (!session || !(session.user?.email)) {
+  //     // TODO: reconsider
+  //     //router.push("/")
+  //   } else {
+  //     let email: string = session.user.email
+  //     //getUserByEmail(email)
+  //     // TODO delete in future
+  //     getUserByEmail('myanmarokinawaevents@gmail.com')
+  //       .then((result) => {
+  //         const user: User = result as User
+  //         setUserId(user.userId)
+  //         if (user) {
+  //           if (user.role === 99) {
+  //             // TODO: reconsider
+  //             //router.push("/admin")
+  //           } 
+  //           // else {
+  //           //   router.push("/tickets/booking")
+  //           // }
+  //         } else {
+  //           // TODO: reconsider
+  //           //router.push("/")
+  //         }
+  //       })
+  //       .catch((error) => console.log(error))
+  //   }
+  // }, [session]);
 
 
   return (

@@ -1,34 +1,26 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useState, useEffect, useCallback, SetStateAction, Suspense } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
-import { Modal, Button, Form } from 'react-bootstrap';
-import styles from "./login.module.css"; // Import the CSS module
+import { Modal, Button } from 'react-bootstrap';
 import '../../common/styles/globals.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { deleteTicketByIds, getTicketsByUserId } from "@/app/services/ticket_service";
+import { getTicketsByUserId } from "@/app/services/ticket_service";
 import Ticket from "../../dao/ticket";
 import { QRCodeCanvas } from 'qrcode.react';
-import { useSearchParams } from 'next/navigation';
 
 const PageContent = () => {
-  //const baseUrl:string = process.env.NEXT_PUBLIC_BASE_URL!
-  // const [tickets, setTickets] = useState([
-  //   { id: 1, title: 'David Lai Concert Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg', paid: '1' },
-  //   { id: 2, title: 'Water Festival Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg', paid: '1'  },
-  //   { id: 3, title: 'Thadingyut Festival Ticket', description: 'Join us for a night of amazing music!', date: 'March 25, 2025', image: '/ticket_sample.jpg', qrCode: '/qr-code-example.jpg', paid: ''  },
-  // ]);
+  const { data: session } = useSession()
+  const userId: string = session?.user.userId ?? ""
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
-  const searchParams = useSearchParams();
-  const userId = searchParams.get('userId') as string;
+  const baseUrl: string = process.env.NEXT_PUBLIC_BASE_URL ?? ""
 
   const handleDelete = (id: number) => {
-    //setTickets(tickets.filter(ticket => ticket. !== id));
     setShowModal(false);
   };
 
@@ -49,7 +41,7 @@ const PageContent = () => {
         setTickets([])
       }
     })
-  }, [])
+  }, [session, getTicketsByUserId, baseUrl])
 
   useEffect(() => {
     _getTicketsByUserId()
@@ -126,8 +118,8 @@ const PageContent = () => {
                   <div className="col-md-4 d-flex justify-content-center">
                     <div style={{ textAlign: 'center', marginTop: '20px' }}>
                       <p style={{ fontSize: '14px', fontWeight: 'bold', color: '#333' }}>QR Scan</p>
-                      {/* <QRCodeCanvas value={`${baseUrl}/admin/qrcode_ticket?userId=${ticket.userId}&ticketId=${ticket.ticketId}`} size={150} /> */}
-                      <QRCodeCanvas value={ticket.ticketId}  size={150} />
+                      <QRCodeCanvas value={`${baseUrl}/admin/qrcode_ticket/${ticket.userId}/${ticket.ticketId}`} size={150} />
+                      {/* <QRCodeCanvas value={ticket.ticketId} size={150} /> */}
                     </div>
                   </div>
                 </div>
