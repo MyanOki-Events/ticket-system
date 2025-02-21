@@ -16,7 +16,7 @@ const LoginForm = () => {
   useEffect(() => {
     if (status === "authenticated") {
       if (session.user.role === 99) {
-        router.replace("/admin");
+        router.replace(callbackUrl ?? "/admin");
       }
       if (session.user.role === 0) {
         router.replace("/tickets/detail");
