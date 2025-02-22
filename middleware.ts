@@ -23,7 +23,6 @@ export default withAuth(
 
 export const config = {
     matcher: [
-        "/((?!_next|public).*)",
         "/admin/:path*",
         "/tickets/:path*"
     ],
