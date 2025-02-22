@@ -121,7 +121,7 @@ const PageContent = () => {
                     <div className="row g-0">
                       <div className="col-md-4 d-flex justify-content-center align-items-center">
                         <Image
-                          src="/ticket_sample.jpg"
+                          src="/water_festival_ticket_final.png"
                           alt={ticket.ticketType}
                           className="img-fluid rounded-start"
                           onMouseDown={(e) => e.preventDefault()}

@@ -7,6 +7,7 @@ import { signIn, useSession } from "next-auth/react";
 import { Suspense, useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@/app/common/styles/globals.css';
+import Image from 'next/image';
 
 const LoginForm = () => {
   const { data: session, status } = useSession()
@@ -48,11 +49,13 @@ const LoginForm = () => {
           <div className="card mt-5 shadow-lg">
             <div className="card-body">
               <div className="text-center">
-                <img
+                <Image
                   src="/oma_logo.png"
                   alt="Logo"
                   className="img-fluid"
                   style={{ width: '150px', height: '150px' }}
+                  height={150}
+                  width={150}
                 />
                 <h1 className={styles.title}>Tickets Booking System</h1>
                 <p className={styles.remark}>Note: You must have a valid gmail</p>
