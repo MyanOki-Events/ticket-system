@@ -12,6 +12,7 @@ import { getTicketsByUserId, deleteTicketByIds} from "@/app/services/ticket_serv
 import Ticket from "../../dao/ticket";
 import { QRCodeCanvas } from 'qrcode.react';
 import MessageAlert from '@/app/components/MessageAlert';
+import Image from 'next/image';
 
 const PageContent = () => {
   const { data: session } = useSession()
@@ -119,13 +120,15 @@ const PageContent = () => {
                     <hr className="styled-hr" />
                     <div className="row g-0">
                       <div className="col-md-4 d-flex justify-content-center align-items-center">
-                        <img
+                        <Image
                           src="/ticket_sample.jpg"
                           alt={ticket.ticketType}
                           className="img-fluid rounded-start"
                           onMouseDown={(e) => e.preventDefault()}
                           onTouchStart={(e) => e.preventDefault()}
                           style={{ maxHeight: '250px', objectFit: 'cover' }}
+                          height={250}
+                          width={1000}
                         />
                       </div>
 
