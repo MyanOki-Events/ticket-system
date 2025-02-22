@@ -53,6 +53,23 @@ body {
     color: #ffcc00; /* Change this to your desired active color */
   }
   
+  .hero-section {
+    background-color: #3498db;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+  }
+
+  .hero-text h3 {
+    font-size: 1rem;
+    font-weight: bold;
+    padding-top: 10px;
+  }
+
+  .hero-text p {
+    font-size: 0.8rem;
+  }
+
   /* Adjust styling for mobile devices */
   @media (max-width: 768px) {
     .styled-hr {

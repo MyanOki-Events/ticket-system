@@ -55,7 +55,7 @@ const LoginForm = () => {
                   style={{ width: '150px', height: '150px' }}
                 />
                 <h1 className={styles.title}>Tickets Booking System</h1>
-                <p className={styles.remark}>Note: You must have a Google account</p>
+                <p className={styles.remark}>Note: You must have a valid gmail</p>
               </div>
               <form>
                 <div className="d-flex justify-content-center">
@@ -63,12 +63,12 @@ const LoginForm = () => {
                     type="button"
                     className="btn btn-primary btn-block mt-3"
                     onClick={handleSignIn}>
-                    Sign in with Google
+                    Sign in with Gmail
                   </button>
                 </div>
               </form>
               {/* User Policy Link */}
-              <div className="mt-4 text-center">
+              <div className="mt-4 text-center" style={{ fontSize: '1rem'}}>
                 <p>
                   By signing in, you agree to our{" "}
                   <button
