@@ -11,12 +11,15 @@ import { useRouter } from 'next/navigation';
 import { getUserByEmail } from '@/app/services/user_service';
 import { User } from '@/app/dao/user';
 import { addNewTickets} from "@/app/services/ticket_service";
+import MessageAlert from '@/app/components/MessageAlert'; 
 
 const TicketsPage = () => {
   const [ticketCount, setTicketCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
+  const [message, setMessage] = useState<string>(''); // Info or success message
+  const [error, setError] = useState<string>(''); // Error message
 
   const handleReset = () => {
     setTicketCount(0);
@@ -37,6 +40,7 @@ const TicketsPage = () => {
       // TODO: reconsider
       router.push(`/tickets/detail?userId=${userId}`);
     } catch (error) {
+      setError('Unexpected error is occured.Please try again');
       console.error("Error while adding tickets:", error);
     } finally {
       setShowModal(false);
@@ -84,6 +88,9 @@ const TicketsPage = () => {
     <><div ><Header /></div>
       <div className="container" style={{ padding: '20px', backgroundColor: '#f8f9fa' }}>
         <h3 className="text-center" style={{ paddingTop: '60px', color: '#2a9d8f' }}>List of Available Tickets</h3>
+        {/* Info or Error Message */}
+        <MessageAlert message={message} type="info" />
+        <MessageAlert message={error} type="danger" />
         <div className="row mt-4">
           <div className="col-md-6 offset-md-3">
             <div className="card shadow">

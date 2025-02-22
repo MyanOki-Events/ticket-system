@@ -11,6 +11,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import { getTicketsByUserId } from "@/app/services/ticket_service";
 import Ticket from "../../dao/ticket";
 import { QRCodeCanvas } from 'qrcode.react';
+import MessageAlert from '@/app/components/MessageAlert';
 
 const PageContent = () => {
   const { data: session } = useSession()
@@ -19,9 +20,12 @@ const PageContent = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
   const baseUrl: string = process.env.NEXT_PUBLIC_BASE_URL ?? ""
+  const [message, setMessage] = useState<string>(''); // Info or success message
+  const [error, setError] = useState<string>(''); // Error message
 
   const handleDelete = (id: number) => {
     setShowModal(false);
+    setMessage('This ticket with ID ${id} is successfully deleted!');
   };
 
   const handleButtonClick = (id: number) => {
@@ -52,6 +56,9 @@ const PageContent = () => {
     <><div ><Header /></div>
       <div className="container" style={{ padding: '20px', backgroundColor: '#f8f9fa' }}>
         <h3 className="text-center" style={{ paddingTop: '60px', color: '#2a9d8f' }}>List of Purchased Tickets</h3>
+        {/* Info or Error Message */}
+        <MessageAlert message={message} type="info" />
+        <MessageAlert message={error} type="danger" />
         <div className="row">
           {tickets.map((ticket, index) => (
             <div key={index + 1} className="col-12 mb-4">
@@ -120,7 +127,6 @@ const PageContent = () => {
                     <div style={{ textAlign: 'center', marginTop: '20px' }}>
                       <p style={{ fontSize: '14px', fontWeight: 'bold', color: '#333' }}>QR Scan</p>
                       <QRCodeCanvas value={`${baseUrl}/admin/qrcode_ticket/${ticket.userId}/${ticket.ticketId}`} size={150} />
-                      {/* <QRCodeCanvas value={ticket.ticketId} size={150} /> */}
                     </div>
                   </div>
                 </div>

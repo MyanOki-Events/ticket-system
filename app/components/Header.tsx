@@ -17,6 +17,8 @@ const Header = ({ }) => {
       setActiveItem('booking');
     } else if (pathname === '/tickets/detail') {
       setActiveItem('detail');
+    } else if (pathname === '/admin') {
+      setActiveItem('admin');
     }
   }, [pathname]);
 
@@ -55,9 +57,12 @@ const Header = ({ }) => {
               <li className={`nav-item ${activeItem === 'detail' ? 'active' : ''}`}>
                 <a className="nav-link" href="/tickets/detail" onClick={() => handleItemClick('detail')}>Detail</a>
               </li>
-              <li className={`nav-item ${activeItem === 'admin' ? 'active' : ''}`}>
-                <a className="nav-link" href="/admin" onClick={() => handleItemClick('admin')}>Admin Dashboard</a>
-              </li>
+              {/* Show Admin Dashboard link if user is admin */}
+              {session && session.user?.role === 99 && (
+                <li className={`nav-item ${activeItem === 'admin' ? 'active' : ''}`}>
+                  <a className="nav-link" href="/admin" onClick={() => handleItemClick('admin')}>Admin Dashboard</a>
+                </li>
+              )}
             </ul>
             <div className="d-flex ms-auto align-items-center">
               {session && (
