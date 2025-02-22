@@ -14,7 +14,6 @@ import { addNewTickets} from "@/app/services/ticket_service";
 import MessageAlert from '@/app/components/MessageAlert'; 
 
 const TicketsPage = () => {
-  const [ticketCount, setTicketCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
@@ -99,11 +98,29 @@ const TicketsPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('Bank Transfer');
   const [userId, setUserId] = useState('');
   
-  const handleConfirmPurchase = async (ticket: Ticket, ticketCount: number)=> {
+  const handleConfirmPurchase = async (ticket: Ticket, ticketCount: number,ticketType:string, totalPrice:string)=> {
     try {
       // TODO after craete event Table , replace with following code
       //await addNewTickets(userId, ticket.id, ticketCount); 
       await addNewTickets(userId,ticketCount);
+      // send email to ticket purchaser
+      // TODO change ticketId value
+      const currentDate = new Date();
+      const formattedDate = currentDate.toLocaleString('ja-JP', {
+        timeZone: 'Asia/Tokyo',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour12: false, // 24-hour format
+      });
+      console.log('Current Date' + formattedDate);
+      console.log('Total Price' + totalPrice);
+      console.log('Payment Method' + paymentMethod);
+      console.log('Ticket Type' + ticketType);
+      console.log('Ticket Count' + ticketCount);
+
+      sendEmail(String(session?.user.email),
+         String(session?.user.name),String(formattedDate),String(totalPrice),paymentMethod,ticketType,'0001',String(ticketCount));
       router.push(`/tickets/detail`);
     } catch (error) {
       setError('Unexpected error is occured.Please try again');
@@ -113,6 +130,48 @@ const TicketsPage = () => {
       handleReset();
     }
   };
+
+  async function sendEmail(email:string,customerName:string,
+    bookingDate:string,
+    amountPaid:string,
+    paymentMethod:string,
+    ticketType:string,
+    ticketId:string,
+    ticketCount:string
+
+  ) {
+    console.log('Send Email Method')
+    try {
+      const res = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: email,
+          customerName: customerName,
+          bookingDate: bookingDate,
+          amountPaid: amountPaid,
+          paymentMethod: paymentMethod,
+          ticketType: ticketType,
+          // ticketId: ticketId,
+          ticketCount: ticketCount
+        }),
+      });
+  
+      // Check if the response is OK before trying to parse it
+      if (res.ok) {
+        const data = await res.json();  // Attempt to parse JSON only if response is OK
+        console.log('Email sent successfully:', data);
+      } else {
+        // Handle non-OK responses (e.g., 400 or 500)
+        console.error('Error sending email: ', res.statusText);
+      }
+    } catch (error) {
+      // Log any errors that occur during the fetch or JSON parsing
+      console.error('Error in sending email request:', error);
+    }
+  }
 
   useEffect(() => {
     if(session?.user) {
@@ -234,7 +293,7 @@ const TicketsPage = () => {
               Cancel
             </Button>
             <Button variant="primary" onClick={() =>
-                    handleConfirmPurchase(selectedTicket, ticketCounts[selectedTicket.id])
+                    handleConfirmPurchase(selectedTicket, ticketCounts[selectedTicket.id],selectedTicket.eventTitle,String(totalPrice(selectedTicket)))
                   }>
               Confirm
             </Button>
