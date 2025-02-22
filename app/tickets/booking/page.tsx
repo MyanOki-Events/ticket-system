@@ -21,24 +21,90 @@ const TicketsPage = () => {
   const [message, setMessage] = useState<string>(''); // Info or success message
   const [error, setError] = useState<string>(''); // Error message
 
-  const handleReset = () => {
-    setTicketCount(0);
+  type Ticket = {
+    id: number;
+    eventTitle: string;
+    eventDate: string;
+    eventTime: string;
+    location: string;
+    price: number;
   };
 
-  const handlePurchase = () => {
+  // TODO (get data from database)
+  const tickets: Ticket[] = [
+    {
+      id: 1,
+      eventTitle: 'David Lai Concert',
+      eventDate: '30th March 2025',
+      eventTime: '11:00 AM - 16:00 PM',
+      location: 'David Lai Concert Hall, Okinawa',
+      price: 3000,
+    },
+    { 
+      id: 2,
+      eventTitle: 'Water Festival',
+      eventDate: '20th May 2025',
+      eventTime: '11:00 AM - 16:00 PM',
+      location: 'Water Festival Event Hall, Okinawa',
+      price: 2500,
+    }
+  ];
+
+  // State for the modal, to display selected ticket information
+  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+
+  // Initialize ticket count state with each ticket having a count of 0
+  const [ticketCounts, setTicketCounts] = useState<{ [key: number]: number }>(
+    tickets.reduce((acc, ticket) => {
+      acc[ticket.id] = 0;
+      return acc;
+    },  {} as { [ticketId: number]: number })
+  );
+
+  // Function to update the count for a specific ticket by ticket ID
+  const handleTicketCountChange = (ticketId: number, change: number) => {
+    setTicketCounts((prevCounts) => ({
+      ...prevCounts,
+      [ticketId]: Math.max(0, prevCounts[ticketId] + change),
+    }));
+  };
+
+  const handleReset = (ticketId?: number) => {
+    //setTicketCount(0);
+    setTicketCounts((prevCounts) => {
+      if (ticketId !== undefined) {
+        return {
+          ...prevCounts,
+          [ticketId]: 0, // Reset the selected ticket count only
+        };
+      } else {
+        // Reset all ticket counts
+        return tickets.reduce((acc, ticket) => {
+          acc[ticket.id] = 0;
+          return acc;
+        }, {} as { [ticketId: number]: number });
+      }
+    });
+  };
+
+  const handlePurchase = (ticket: Ticket) => {
+    setSelectedTicket(ticket);
     setShowModal(true);
   };
 
-  const ticketPrice = 2500;
-  const totalPrice = ticketCount * ticketPrice;
+  const totalPrice = (ticket: Ticket) => {
+    return ticketCounts[ticket.id] * ticket.price;
+  };
 
   const [paymentMethod, setPaymentMethod] = useState('Bank Transfer');
   const [userId, setUserId] = useState('');
-  const handleConfirmPurchase = async (ticketCount : number) => {
+  
+  const handleConfirmPurchase = async (ticket: Ticket, ticketCount: number)=> {
     try {
+      // TODO after craete event Table , replace with following code
+      //await addNewTickets(userId, ticket.id, ticketCount); 
       await addNewTickets(userId,ticketCount);
-      // TODO: reconsider
-      router.push(`/tickets/detail?userId=${userId}`);
+      router.push(`/tickets/detail`);
     } catch (error) {
       setError('Unexpected error is occured.Please try again');
       console.error("Error while adding tickets:", error);
@@ -54,36 +120,6 @@ const TicketsPage = () => {
     }
   })
 
-  // useEffect(() => {
-  //   if (!session || !(session.user?.email)) {
-  //     // TODO: reconsider
-  //     //router.push("/")
-  //   } else {
-  //     let email: string = session.user.email
-  //     //getUserByEmail(email)
-  //     // TODO delete in future
-  //     getUserByEmail('myanmarokinawaevents@gmail.com')
-  //       .then((result) => {
-  //         const user: User = result as User
-  //         setUserId(user.userId)
-  //         if (user) {
-  //           if (user.role === 99) {
-  //             // TODO: reconsider
-  //             //router.push("/admin")
-  //           } 
-  //           // else {
-  //           //   router.push("/tickets/booking")
-  //           // }
-  //         } else {
-  //           // TODO: reconsider
-  //           //router.push("/")
-  //         }
-  //       })
-  //       .catch((error) => console.log(error))
-  //   }
-  // }, [session]);
-
-
   return (
     <><div ><Header /></div>
       <div className="container" style={{ padding: '20px', backgroundColor: '#f8f9fa' }}>
@@ -93,182 +129,70 @@ const TicketsPage = () => {
         <MessageAlert message={error} type="danger" />
         <div className="row mt-4">
           <div className="col-md-6 offset-md-3">
-            <div className="card shadow">
-              <div className="card-body text-center">
-                <h6 className="card-title">David Lai Concert Admission Ticket</h6>
-                <div className="mt-4 mb-4">
-                  <div className="d-flex flex-column align-items-center">
-                    <div className="d-flex align-items-center mb-3">
-                      <i className="bi bi-calendar-event text-primary me-3" style={{ fontSize: '24px' }}></i>
-                      <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
-                        20th October 2025
-                      </p>
-                    </div>
-                    <div className="d-flex align-items-center mb-3" style={{ lineHeight: '1' }}>
-                      <i className="bi bi-clock text-warning me-3" style={{ fontSize: '24px' }}></i>
-                      <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
-                        10:00 AM - 4:00 PM
-                      </p>
-                    </div>
-                    <div className="d-flex align-items-center" style={{ lineHeight: '1' }}>
-                      <i className="bi bi-geo-alt text-success me-3" style={{ fontSize: '24px' }}></i>
-                      <p className="text-muted mb-0" style={{ fontSize: '14px', }}>
-                        Thadingyut Event Hall, Yangon
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <p className="card-text" style={{ fontSize: '12px' }}><strong>Price per ticket: &#165;2500</strong></p>
-                <div className="input-group">
-                  <button
-                    className="btn btn-outline-secondary"
-                    type="button"
-                    onClick={() => setTicketCount(Math.max(0, ticketCount - 1))}
-                  >
-                    -
-                  </button>
-                  <input
-                    type="text"
-                    className="form-control text-center"
-                    value={ticketCount}
-                    readOnly />
-                  <button
-                    className="btn btn-outline-secondary"
-                    type="button"
-                    onClick={() => setTicketCount(ticketCount + 1)}
-                  >
-                    +
-                  </button>
-                </div>
-                <button className="btn btn-outline-danger mt-3 me-2" onClick={handleReset}>
-                  Reset
-                </button>
-                <button className="btn btn-primary mt-3" onClick={handlePurchase}>
-                  Purchase
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="row mt-4">
-          <div className="col-md-6 offset-md-3">
-            <div className="card shadow">
-              <div className="card-body text-center">
-                <h6 className="card-title">Water Festival Admission Ticket</h6>
-                <div className="mt-4 mb-4">
-                  <div className="d-flex flex-column align-items-center">
-                    <div className="d-flex align-items-center mb-3">
-                      <i className="bi bi-calendar-event text-primary me-3" style={{ fontSize: '24px' }}></i>
-                      <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
-                        20th October 2025
-                      </p>
-                    </div>
-                    <div className="d-flex align-items-center mb-3" style={{ lineHeight: '1' }}>
-                      <i className="bi bi-clock text-warning me-3" style={{ fontSize: '24px' }}></i>
-                      <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
-                        10:00 AM - 4:00 PM
-                      </p>
-                    </div>
-                    <div className="d-flex align-items-center" style={{ lineHeight: '1' }}>
-                      <i className="bi bi-geo-alt text-success me-3" style={{ fontSize: '24px' }}></i>
-                      <p className="text-muted mb-0" style={{ fontSize: '14px', }}>
-                        Thadingyut Event Hall, Yangon
-                      </p>
+            {tickets.map((ticket, index) => (
+              <div key={index} className="card shadow mb-4">
+                <div className="card-body text-center">
+                  <h6 className="card-title">{ticket.eventTitle} Admission Ticket</h6>
+                  <div className="mt-4 mb-4">
+                    <div className="d-flex flex-column align-items-center">
+                      <div className="d-flex align-items-center mb-3">
+                        <i className="bi bi-calendar-event text-primary me-3" style={{ fontSize: '24px' }}></i>
+                        <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
+                          {ticket.eventDate}
+                        </p>
+                      </div>
+                      <div className="d-flex align-items-center mb-3" style={{ lineHeight: '1' }}>
+                        <i className="bi bi-clock text-warning me-3" style={{ fontSize: '24px' }}></i>
+                        <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
+                          {ticket.eventTime}
+                        </p>
+                      </div>
+                      <div className="d-flex align-items-center" style={{ lineHeight: '1' }}>
+                        <i className="bi bi-geo-alt text-success me-3" style={{ fontSize: '24px' }}></i>
+                        <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
+                          {ticket.location}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <p className="card-text" style={{ fontSize: '12px' }}><strong>Price per ticket: &#165;2500</strong></p>
-                <div className="input-group">
-                  <button
-                    className="btn btn-outline-secondary"
-                    type="button"
-                    onClick={() => setTicketCount(Math.max(0, ticketCount - 1))}
-                  >
-                    -
-                  </button>
-                  <input
-                    type="text"
-                    className="form-control text-center"
-                    value={ticketCount}
-                    readOnly />
-                  <button
-                    className="btn btn-outline-secondary"
-                    type="button"
-                    onClick={() => setTicketCount(ticketCount + 1)}
-                  >
-                    +
-                  </button>
-                </div>
-                <button className="btn btn-outline-danger mt-3 me-2" onClick={handleReset}>
-                  Reset
-                </button>
-                <button className="btn btn-primary mt-3" onClick={handlePurchase}>
-                  Purchase
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="row mt-4">
-          <div className="col-md-6 offset-md-3">
-            <div className="card shadow">
-              <div className="card-body text-center">
-                <h6 className="card-title">Thadingyut Admission Ticket</h6>
-                <div className="mt-4 mb-4">
-                  <div className="d-flex flex-column align-items-center">
-                    <div className="d-flex align-items-center mb-3">
-                      <i className="bi bi-calendar-event text-primary me-3" style={{ fontSize: '24px' }}></i>
-                      <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
-                        20th October 2025
-                      </p>
-                    </div>
-                    <div className="d-flex align-items-center mb-3" style={{ lineHeight: '1' }}>
-                      <i className="bi bi-clock text-warning me-3" style={{ fontSize: '24px' }}></i>
-                      <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
-                        10:00 AM - 4:00 PM
-                      </p>
-                    </div>
-                    <div className="d-flex align-items-center" style={{ lineHeight: '1' }}>
-                      <i className="bi bi-geo-alt text-success me-3" style={{ fontSize: '24px' }}></i>
-                      <p className="text-muted mb-0" style={{ fontSize: '14px', }}>
-                        Thadingyut Event Hall, Yangon
-                      </p>
-                    </div>
+                  <p className="card-text" style={{ fontSize: '12px' }}>
+                    <strong>Price per ticket: &#165;{ticket.price}</strong>
+                  </p>
+                  <div className="input-group">
+                    <button
+                      className="btn btn-outline-secondary"
+                      type="button"
+                      onClick={() =>  handleTicketCountChange(ticket.id, -1)}
+                    >
+                      -
+                    </button>
+                    <input
+                      type="text"
+                      className="form-control text-center"
+                      value={ticketCounts[ticket.id]}
+                      readOnly
+                    />
+                    <button
+                      className="btn btn-outline-secondary"
+                      type="button"
+                      onClick={() => handleTicketCountChange(ticket.id, 1)}
+                    >
+                      +
+                    </button>
                   </div>
-                </div>
-                <p className="card-text" style={{ fontSize: '12px' }}><strong>Price per ticket: &#165;2500</strong></p>
-                <div className="input-group">
-                  <button
-                    className="btn btn-outline-secondary"
-                    type="button"
-                    onClick={() => setTicketCount(Math.max(0, ticketCount - 1))}
-                  >
-                    -
+                  <button className="btn btn-outline-danger mt-3 me-2" onClick={() => handleReset(ticket.id)}>
+                    Reset
                   </button>
-                  <input
-                    type="text"
-                    className="form-control text-center"
-                    value={ticketCount}
-                    readOnly />
-                  <button
-                    className="btn btn-outline-secondary"
-                    type="button"
-                    onClick={() => setTicketCount(ticketCount + 1)}
-                  >
-                    +
+                  <button className="btn btn-primary mt-3" onClick={() => handlePurchase(ticket)}>
+                    Purchase
                   </button>
                 </div>
-                <button className="btn btn-outline-danger mt-3 me-2" onClick={handleReset}>
-                  Reset
-                </button>
-                <button className="btn btn-primary mt-3" onClick={handlePurchase}>
-                  Purchase
-                </button>
               </div>
-            </div>
+            ))}
           </div>
         </div>
         {/* Modal for Ticket Purchase Confirmation */}
+        {selectedTicket && (
         <Modal
           show={showModal}
           onHide={() => setShowModal(false)}
@@ -282,13 +206,13 @@ const TicketsPage = () => {
           <Modal.Body className="bg-light py-4 px-5">
             <div className="mb-4">
               <h5 className="text-dark mb-2" style={{ fontSize: '16px' }}>
-                Are you sure you want to purchase {ticketCount} tickets?
+                Are you sure you want to purchase {ticketCounts[selectedTicket.id]} tickets?
               </h5>
               <p className="text-muted mb-1" style={{ fontSize: '14px' }}>
-                <strong>Ticket Type:</strong> Water Festival
+                <strong>Ticket Type:</strong> {selectedTicket.eventTitle}
               </p>
               <p className="text-muted mb-1" style={{ fontSize: '14px' }}>
-                <strong>Total Price:</strong> &#165;{totalPrice}
+                <strong>Total Price:</strong> &#165;{totalPrice(selectedTicket)}
               </p>
             </div>
             <Form.Group>
@@ -309,11 +233,14 @@ const TicketsPage = () => {
             <Button variant="secondary" onClick={() => setShowModal(false)}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={async () => await handleConfirmPurchase(ticketCount)}>
+            <Button variant="primary" onClick={() =>
+                    handleConfirmPurchase(selectedTicket, ticketCounts[selectedTicket.id])
+                  }>
               Confirm
             </Button>
           </Modal.Footer>
         </Modal>
+        )}
         <Footer />
       </div></>
   );

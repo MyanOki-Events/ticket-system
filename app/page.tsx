@@ -6,6 +6,7 @@ import styles from "./login.module.css";
 import { signIn, useSession } from "next-auth/react";
 import { Suspense, useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '@/app/common/styles/globals.css';
 
 const LoginForm = () => {
   const { data: session, status } = useSession()
