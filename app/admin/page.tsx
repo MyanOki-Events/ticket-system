@@ -9,6 +9,9 @@ import { User } from "../dao/user";
 
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/navigation';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Header from '@/app/components/Header';
+import Footer from '@/app/components/Footer';
 
 const AdminPage = () => {
   const { data: session } = useSession();
@@ -36,11 +39,12 @@ const AdminPage = () => {
   }
 
   return (
-    <div className="container">
-      <h1 className="text-center">Admin Dashboard</h1>
+    <><div ><Header />
+    <div className="container" style={{ padding: '20px' }}>
+      <h1 className="text-center text-dark" style={{ paddingTop: '60px' }}>Admin Dashboard</h1>
 
       <section>
-        <h3>All Users</h3>
+        <h3 className="text-dark">All Users</h3>
         <div className="overflow-x-scroll">
           <table className="table table-sm table-bordered border-dark">
             <thead>
@@ -67,6 +71,8 @@ const AdminPage = () => {
         </div>
       </section>
     </div>
+    <Footer />
+    </div></>
   );
 };
 

@@ -13,6 +13,7 @@ import { deleteTicketByIds, getTicketsByUserId } from "@/app/services/ticket_ser
 import Ticket from "../../dao/ticket";
 import { QRCodeCanvas } from 'qrcode.react';
 import { useSearchParams } from 'next/navigation';
+import MessageAlert from '@/app/components/MessageAlert';
 
 const PageContent = () => {
   //const baseUrl:string = process.env.NEXT_PUBLIC_BASE_URL!
@@ -26,10 +27,13 @@ const PageContent = () => {
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
   const searchParams = useSearchParams();
   const userId = searchParams.get('userId') as string;
+  const [message, setMessage] = useState<string>(''); // Info or success message
+  const [error, setError] = useState<string>(''); // Error message
 
   const handleDelete = (id: number) => {
     //setTickets(tickets.filter(ticket => ticket. !== id));
-    setShowModal(false);
+    setShowModal(false); // Close the modal
+    setMessage('This ticket with ID ${id} is successfully deleted!');
   };
 
   const handleButtonClick = (id: number) => {
@@ -59,13 +63,17 @@ const PageContent = () => {
     <><div ><Header /></div>
       <div className="container" style={{ padding: '20px', backgroundColor: '#f8f9fa' }}>
         <h3 className="text-center" style={{ paddingTop: '60px', color: '#2a9d8f' }}>List of Purchased Tickets</h3>
+        {/* Info or Error Message */}
+        <MessageAlert message={message} type="info" />
+        <MessageAlert message={error} type="danger" />
         <div className="row">
           {tickets.map((ticket, index) => (
             <div key={index + 1} className="col-12 mb-4">
               <div className="card shadow-lg rounded-3 ticket-card" style={{ position: 'relative', userSelect: 'none', overflow: 'hidden' }}>
                 <div className="d-flex justify-content-between align-items-center p-2">
                   <span className="beautiful-header text-dark" style={{ fontSize: '20px' }}>{ticket.ticketType} ({index + 1})</span>
-                  <button className="btn btn-delete" onClick={() => handleButtonClick(index + 1)}>
+                  <button className="btn btn-delete" onClick={() => handleButtonClick(index + 1)}
+                    disabled={ticket.isPaid}>
                     Delete <i className="bi bi-trash"></i>
                   </button>
                 </div>

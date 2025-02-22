@@ -20,6 +20,8 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [user, setUser] = useState<any>(null); // Store user info
   const router = useRouter();
+  // State to handle modal visibility
+  const [showModal, setShowModal] = useState(false);
   const handleSignIn = async () => {
     // First, validate email before proceeding with sign-in
     // if (!validateEmail(email)) {
@@ -54,6 +56,14 @@ const LoginPage = () => {
     } catch (error) {
       console.error("Error during sign out:", error);
     }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+  const handleShowModal = () => {
+    setShowModal(true);
   };
 
   return (
@@ -95,6 +105,81 @@ const LoginPage = () => {
                     </button>
                   </div>
                 </form>
+                {/* User Policy Link */}
+                <div className="mt-4 text-center">
+                  <p>
+                    By signing in, you agree to our{" "}
+                    <button
+                      className="btn btn-link p-0"
+                      onClick={handleShowModal}
+                      style={{ textDecoration: "none", color: "#007bff" }}
+                    >
+                      User Policy
+                    </button>
+                    .
+                  </p>
+                </div>
+            </div>
+          </div>
+
+          {/* Modal for User Policy */}
+          <div
+            className={`modal fade ${showModal ? "show" : ""}`}
+            tabIndex={-1}
+            aria-labelledby="userPolicyModalLabel"
+            aria-hidden={!showModal}
+            style={{ display: showModal ? "block" : "none" }}
+          >
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title text-dark" id="userPolicyModalLabel">
+                    User Policy
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={handleCloseModal}
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  <h5 className=" text-dark">Terms of Service</h5>
+                  <p className=" text-dark">
+                    1. Data Collection
+                    <br />
+                    - We collect basic information from your Gmail account such as your name and email address. This is used only to create your user profile and allow you to sign in to our service.
+                  </p>
+                  <p className=" text-dark">
+                    2. How We Use Your Data
+                    <br />
+                    - We use the information collected from your Gmail account to provide you with a personalized experience on our platform, such as displaying your name on the interface.
+                    <br />
+                    - We do not share or sell your data to third parties for marketing purposes.
+                  </p>
+                  <p className=" text-dark">
+                    3. How We Protect Your Data
+                    <br />
+                    - We use industry-standard encryption and security practices to protect your personal information from unauthorized access.
+                      Your information is stored securely and only accessible by authorized personnel.
+                  </p>
+                  <p className=" text-dark">
+                    4. Third-Party Services
+                    <br />
+                    - We use third-party services like Google for authentication, and by using Gmail to sign in, you are also bound by Google’s privacy policy.
+                      We are not responsible for the privacy practices of third-party services. Please review Google’s privacy policy for more information.
+                  </p>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={handleCloseModal}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -17,6 +17,8 @@ const Header = ({ }) => {
         setActiveItem('booking');
       } else if (pathname === '/tickets/detail') {
         setActiveItem('detail');
+      } else if (pathname === '/admin') {
+        setActiveItem('admin');
       }
   }, [pathname]);
 
