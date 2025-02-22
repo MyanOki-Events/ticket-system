@@ -9,6 +9,9 @@ export default withAuth(
             return NextResponse.redirect(new URL("/error/not-authorized", req.url));
         }
 
+        if (req.nextUrl.pathname.startsWith('/_next') || req.nextUrl.pathname.startsWith('/public')) {
+            return NextResponse.next()
+        }
         return NextResponse.next();
     },
     {
