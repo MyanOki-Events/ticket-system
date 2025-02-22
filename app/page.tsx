@@ -29,7 +29,7 @@ const LoginForm = () => {
 
   // Login Handle
   const handleSignIn = async () => {
-    await signIn("google", { callbackUrl });
+    await signIn("google", { callbackUrl: "/" });
   };
 
   const handleCloseModal = () => {
@@ -122,13 +122,13 @@ const LoginForm = () => {
                     3. How We Protect Your Data
                     <br />
                     - We use industry-standard encryption and security practices to protect your personal information from unauthorized access.
-                      Your information is stored securely and only accessible by authorized personnel.
+                    Your information is stored securely and only accessible by authorized personnel.
                   </p>
                   <p className=" text-dark">
                     4. Third-Party Services
                     <br />
                     - We use third-party services like Google for authentication, and by using Gmail to sign in, you are also bound by Google’s privacy policy.
-                      We are not responsible for the privacy practices of third-party services. Please review Google’s privacy policy for more information.
+                    We are not responsible for the privacy practices of third-party services. Please review Google’s privacy policy for more information.
                   </p>
                 </div>
                 <div className="modal-footer">
