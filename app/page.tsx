@@ -11,7 +11,7 @@ const LoginForm = () => {
   const { data: session, status } = useSession()
   const searchParams = useSearchParams();
   const router = useRouter()
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const callbackUrl = searchParams.get("callbackUrl");
   // State to handle modal visibility
   const [showModal, setShowModal] = useState(false);
 
