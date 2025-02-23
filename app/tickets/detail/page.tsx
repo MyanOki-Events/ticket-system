@@ -13,6 +13,7 @@ import Ticket from "../../dao/ticket";
 import { QRCodeCanvas } from 'qrcode.react';
 import MessageAlert from '@/app/components/MessageAlert';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 
 const PageContent = () => {
   const { data: session } = useSession()
@@ -24,6 +25,8 @@ const PageContent = () => {
   const [message, setMessage] = useState<string>(''); // Info or success message
   const [error, setError] = useState<string>(''); // Error message
   const [autoIncrementedTickets, setAutoIncrementedTickets] = useState<{ ticketType: string, tickets: (Ticket & { autoIncrementedId: number })[] }[]>([]);
+  const searchParams = useSearchParams();
+  const purchaseStatus = searchParams.get('purchaseStatus');
 
   // チケットデータが変更されたときにグループ化とID付けを実行
   useEffect(() => {
@@ -88,6 +91,9 @@ const PageContent = () => {
 
   useEffect(() => {
     _getTicketsByUserId()
+    if (purchaseStatus) {
+      setMessage('Booking of the ticket(s) are successully completed!.We will send email of booking detail to your email.'); // メッセージをstateにセット
+    }
   }, [_getTicketsByUserId])
 
   return (
@@ -98,7 +104,14 @@ const PageContent = () => {
         <MessageAlert message={message} type="info" />
         <MessageAlert message={error} type="danger" />
         <div className="row">
-          {autoIncrementedTickets.map((group, groupIndex) => (
+          {autoIncrementedTickets.length === 0 ? (
+            <div className="col-12 mb-4">
+              <div className="alert alert-warning text-center" role="alert">
+                <span style={{ fontSize: '1.3rem' }}>There is no tickets available at the moment.</span><br/>
+                <span style={{ fontSize: '0.8rem' }}>Please move to 'Booking' page and reserve a ticket.</span>
+              </div>
+            </div>
+          ) : (autoIncrementedTickets.map((group, groupIndex) => (
             <div key={groupIndex} className="col-12 mb-4">
               {group.tickets.map((ticket) => (
                 <div key={ticket.ticketId} className="col-12 mb-4">
@@ -187,7 +200,8 @@ const PageContent = () => {
                 </div>
               ))}
             </div>
-          ))}
+            ))
+          )}
         </div>
           {/* Modal for Delete Confirmation */}
           <Modal

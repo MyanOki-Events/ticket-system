@@ -121,7 +121,7 @@ const TicketsPage = () => {
 
       sendEmail(String(session?.user.email),
          String(session?.user.name),String(formattedDate),String(totalPrice),paymentMethod,ticketType,'0001',String(ticketCount));
-      router.push(`/tickets/detail`);
+      router.push(`/tickets/detail?purchaseStatus=success`);
     } catch (error) {
       setError('Unexpected error is occured.Please try again');
       console.error("Error while adding tickets:", error);
@@ -243,7 +243,7 @@ const TicketsPage = () => {
                     Reset
                   </button>
                   <button className="btn btn-primary mt-3" onClick={() => handlePurchase(ticket)}>
-                    Purchase
+                    Reserve
                   </button>
                 </div>
               </div>
