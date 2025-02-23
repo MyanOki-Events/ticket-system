@@ -1,4 +1,4 @@
-"use-client"
+"use client"
 
 import { SetStateAction, useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -17,6 +17,8 @@ const Header = ({ }) => {
       setActiveItem('booking');
     } else if (pathname === '/tickets/detail') {
       setActiveItem('detail');
+    } else if (pathname === '/admin/event' || pathname === '/admin/event/add_new' || pathname.includes('/admin/event/edit_old')) {
+      setActiveItem('event');
     } else if (pathname === '/admin') {
       setActiveItem('admin');
     }
@@ -59,9 +61,14 @@ const Header = ({ }) => {
               </li>
               {/* Show Admin Dashboard link if user is admin */}
               {session && session.user?.role === 99 && (
-                <li className={`nav-item ${activeItem === 'admin' ? 'active' : ''}`}>
-                  <a className="nav-link" href="/admin" onClick={() => handleItemClick('admin')}>Admin Dashboard</a>
-                </li>
+                <>
+                  <li className={`nav-item ${activeItem === 'event' ? 'active' : ''}`}>
+                    <a className="nav-link" href="/admin/event" onClick={() => handleItemClick('event')}>Events</a>
+                  </li>
+                  <li className={`nav-item ${activeItem === 'admin' ? 'active' : ''}`}>
+                    <a className="nav-link" href="/admin" onClick={() => handleItemClick('admin')}>Admin Dashboard</a>
+                  </li>
+                </>
               )}
             </ul>
             <div className="d-flex ms-auto align-items-center">

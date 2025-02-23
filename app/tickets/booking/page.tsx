@@ -10,8 +10,10 @@ import { useSession } from "next-auth/react";
 import { useRouter } from 'next/navigation';
 import { getUserByEmail } from '@/app/services/user_service';
 import { User } from '@/app/dao/user';
-import { addNewTickets} from "@/app/services/ticket_service";
-import MessageAlert from '@/app/components/MessageAlert'; 
+import { addNewTickets } from "@/app/services/ticket_service";
+import MessageAlert from '@/app/components/MessageAlert';
+import Event from '@/app/dao/event';
+import { getAllEvent } from '@/app/services/event_services';
 
 const TicketsPage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -19,57 +21,32 @@ const TicketsPage = () => {
   const router = useRouter();
   const [message, setMessage] = useState<string>(''); // Info or success message
   const [error, setError] = useState<string>(''); // Error message
-
-  type Ticket = {
-    id: number;
-    eventTitle: string;
-    eventDate: string;
-    eventTime: string;
-    location: string;
-    price: number;
-  };
-
-  // TODO (get data from database)
-  const tickets: Ticket[] = [
-    {
-      id: 1,
-      eventTitle: 'David Lai Concert',
-      eventDate: '30th March 2025',
-      eventTime: '11:00 AM - 16:00 PM',
-      location: 'David Lai Concert Hall, Okinawa',
-      price: 3000,
-    },
-    { 
-      id: 2,
-      eventTitle: 'Water Festival',
-      eventDate: '20th May 2025',
-      eventTime: '11:00 AM - 16:00 PM',
-      location: 'Water Festival Event Hall, Okinawa',
-      price: 2500,
-    }
-  ];
+  const [tickets, setTickets] = useState<Event[]>([]);
 
   // State for the modal, to display selected ticket information
-  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+  const [selectedTicket, setSelectedTicket] = useState<Event | null>(null);
 
   // Initialize ticket count state with each ticket having a count of 0
-  const [ticketCounts, setTicketCounts] = useState<{ [key: number]: number }>(
-    tickets.reduce((acc, ticket) => {
-      acc[ticket.id] = 0;
-      return acc;
-    },  {} as { [ticketId: number]: number })
+  const [ticketCounts, setTicketCounts] = useState<{ [key: string]: number }>({}
+    // tickets.reduce((acc, ticket) => {
+    //   // console.log("Before", acc)
+    //   acc[ticket.eventId] = 0;
+    //   // console.log("After", acc)
+    //   return acc;
+    // }, {} as { [ticketId: string]: number })
   );
 
   // Function to update the count for a specific ticket by ticket ID
-  const handleTicketCountChange = (ticketId: number, change: number) => {
+  const handleTicketCountChange = (ticketId: string, change: number) => {
+    console.log(ticketId)
+    console.log("=>", ticketCounts[ticketId])
     setTicketCounts((prevCounts) => ({
       ...prevCounts,
-      [ticketId]: Math.max(0, prevCounts[ticketId] + change),
+      [ticketId]: Math.max(0, (prevCounts[ticketId] ?? 0) + change),
     }));
   };
 
-  const handleReset = (ticketId?: number) => {
-    //setTicketCount(0);
+  const handleReset = (ticketId?: string) => {
     setTicketCounts((prevCounts) => {
       if (ticketId !== undefined) {
         return {
@@ -79,30 +56,29 @@ const TicketsPage = () => {
       } else {
         // Reset all ticket counts
         return tickets.reduce((acc, ticket) => {
-          acc[ticket.id] = 0;
+          acc[ticket.eventId] = 0;
           return acc;
-        }, {} as { [ticketId: number]: number });
+        }, {} as { [ticketId: string]: number });
       }
     });
   };
 
-  const handlePurchase = (ticket: Ticket) => {
+  const handlePurchase = (ticket: Event) => {
     setSelectedTicket(ticket);
     setShowModal(true);
   };
 
-  const totalPrice = (ticket: Ticket) => {
-    return ticketCounts[ticket.id] * ticket.price;
+  const totalPrice = (ticket: Event) => {
+    return ticketCounts[ticket.eventId] * ticket.price;
   };
 
   const [paymentMethod, setPaymentMethod] = useState('Bank Transfer');
   const [userId, setUserId] = useState('');
-  
-  const handleConfirmPurchase = async (ticket: Ticket, ticketCount: number,ticketType:string, totalPrice:string)=> {
+  const handleConfirmPurchase = async (ticket: Event, ticketCount: number, ticketType: string, totalPrice: string) => {
     try {
       // TODO after craete event Table , replace with following code
       //await addNewTickets(userId, ticket.id, ticketCount); 
-      await addNewTickets(userId,ticketCount);
+      await addNewTickets(userId, ticketCount);
       // send email to ticket purchaser
       // TODO change ticketId value
       const currentDate = new Date();
@@ -120,7 +96,7 @@ const TicketsPage = () => {
       console.log('Ticket Count' + ticketCount);
 
       sendEmail(String(session?.user.email),
-         String(session?.user.name),String(formattedDate),String(totalPrice),paymentMethod,ticketType,'0001',String(ticketCount));
+        String(session?.user.name), String(formattedDate), String(totalPrice), paymentMethod, ticketType, ticket.eventCode, String(ticketCount));
       router.push(`/tickets/detail?purchaseStatus=success`);
     } catch (error) {
       setError('Unexpected error is occured.Please try again');
@@ -131,13 +107,13 @@ const TicketsPage = () => {
     }
   };
 
-  async function sendEmail(email:string,customerName:string,
-    bookingDate:string,
-    amountPaid:string,
-    paymentMethod:string,
-    ticketType:string,
-    ticketId:string,
-    ticketCount:string
+  async function sendEmail(email: string, customerName: string,
+    bookingDate: string,
+    amountPaid: string,
+    paymentMethod: string,
+    ticketType: string,
+    ticketId: string,
+    ticketCount: string
 
   ) {
     console.log('Send Email Method')
@@ -158,7 +134,7 @@ const TicketsPage = () => {
           ticketCount: ticketCount
         }),
       });
-  
+
       // Check if the response is OK before trying to parse it
       if (res.ok) {
         const data = await res.json();  // Attempt to parse JSON only if response is OK
@@ -174,10 +150,26 @@ const TicketsPage = () => {
   }
 
   useEffect(() => {
-    if(session?.user) {
+    if (session?.user) {
       setUserId(session?.user.userId)
     }
-  })
+
+    getAllEvent()
+      .then((res) => {
+        setTickets(res)
+
+        // set init value for event ticket
+        const count = Object.keys(ticketCounts)
+        if (count && count.length === 0) {
+          let data: { [key: string]: number } = {}
+          tickets.map((eve) => {
+            data[eve.eventId] = 0
+          })
+          setTicketCounts(data)
+        }
+      })
+      .catch((error) => console.log(error))
+  }, [session, getAllEvent, ticketCounts])
 
   return (
     <><div ><Header /></div>
@@ -221,28 +213,29 @@ const TicketsPage = () => {
                     <button
                       className="btn btn-outline-secondary"
                       type="button"
-                      onClick={() =>  handleTicketCountChange(ticket.id, -1)}
+                      onClick={() => handleTicketCountChange(ticket.eventId, -1)}
                     >
                       -
                     </button>
                     <input
                       type="text"
                       className="form-control text-center"
-                      value={ticketCounts[ticket.id]}
+                      // value={ticketCounts[ticket.eventId]}
+                      value={ticketCounts[ticket.eventId] ?? 0}
                       readOnly
                     />
                     <button
                       className="btn btn-outline-secondary"
                       type="button"
-                      onClick={() => handleTicketCountChange(ticket.id, 1)}
+                      onClick={() => handleTicketCountChange(ticket.eventId, 1)}
                     >
                       +
                     </button>
                   </div>
-                  <button className="btn btn-outline-danger mt-3 me-2" onClick={() => handleReset(ticket.id)}>
+                  <button className="btn btn-outline-danger mt-3 me-2" onClick={() => handleReset(ticket.eventId)}>
                     Reset
                   </button>
-                  <button className="btn btn-primary mt-3" onClick={() => handlePurchase(ticket)}>
+                  <button className="btn btn-primary mt-3" onClick={() => handlePurchase(ticket)} disabled={(ticketCounts[ticket.eventId] && ticketCounts[ticket.eventId] > 0) ? false : true}>
                     Reserve
                   </button>
                 </div>
@@ -252,53 +245,53 @@ const TicketsPage = () => {
         </div>
         {/* Modal for Ticket Purchase Confirmation */}
         {selectedTicket && (
-        <Modal
-          show={showModal}
-          onHide={() => setShowModal(false)}
-          centered
-          size="lg"
-          backdrop="static"
-        >
-          <Modal.Header closeButton className="bg-primary text-white">
-            <Modal.Title style={{ fontSize: '18px' }}>Confirm Your Purchase</Modal.Title>
-          </Modal.Header>
-          <Modal.Body className="bg-light py-4 px-5">
-            <div className="mb-4">
-              <h5 className="text-dark mb-2" style={{ fontSize: '16px' }}>
-                Are you sure you want to purchase {ticketCounts[selectedTicket.id]} tickets?
-              </h5>
-              <p className="text-muted mb-1" style={{ fontSize: '14px' }}>
-                <strong>Ticket Type:</strong> {selectedTicket.eventTitle}
-              </p>
-              <p className="text-muted mb-1" style={{ fontSize: '14px' }}>
-                <strong>Total Price:</strong> &#165;{totalPrice(selectedTicket)}
-              </p>
-            </div>
-            <Form.Group>
-              <Form.Label className="text-dark" style={{ fontSize: '14px' }}>Payment Method</Form.Label>
-              <Form.Control
-                as="select"
-                value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-                className="shadow-sm"
-                style={{ fontSize: '14px' }}
-              >
-                <option>Bank Transfer</option>
-                <option>In Person</option>
-              </Form.Control>
-            </Form.Group>
-          </Modal.Body>
-          <Modal.Footer className="bg-light py-3">
-            <Button variant="secondary" onClick={() => setShowModal(false)}>
-              Cancel
-            </Button>
-            <Button variant="primary" onClick={() =>
-                    handleConfirmPurchase(selectedTicket, ticketCounts[selectedTicket.id],selectedTicket.eventTitle,String(totalPrice(selectedTicket)))
-                  }>
-              Confirm
-            </Button>
-          </Modal.Footer>
-        </Modal>
+          <Modal
+            show={showModal}
+            onHide={() => setShowModal(false)}
+            centered
+            size="lg"
+            backdrop="static"
+          >
+            <Modal.Header closeButton className="bg-primary text-white">
+              <Modal.Title style={{ fontSize: '18px' }}>Confirm Your Purchase</Modal.Title>
+            </Modal.Header>
+            <Modal.Body className="bg-light py-4 px-5">
+              <div className="mb-4">
+                <h5 className="text-dark mb-2" style={{ fontSize: '16px' }}>
+                  Are you sure you want to purchase {ticketCounts[selectedTicket.eventId]} tickets?
+                </h5>
+                <p className="text-muted mb-1" style={{ fontSize: '14px' }}>
+                  <strong>Ticket Type:</strong> {selectedTicket.eventTitle}
+                </p>
+                <p className="text-muted mb-1" style={{ fontSize: '14px' }}>
+                  <strong>Total Price:</strong> &#165;{totalPrice(selectedTicket)}
+                </p>
+              </div>
+              <Form.Group>
+                <Form.Label className="text-dark" style={{ fontSize: '14px' }}>Payment Method</Form.Label>
+                <Form.Control
+                  as="select"
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="shadow-sm"
+                  style={{ fontSize: '14px' }}
+                >
+                  <option>Bank Transfer</option>
+                  <option>In Person</option>
+                </Form.Control>
+              </Form.Group>
+            </Modal.Body>
+            <Modal.Footer className="bg-light py-3">
+              <Button variant="secondary" onClick={() => setShowModal(false)}>
+                Cancel
+              </Button>
+              <Button variant="primary" onClick={() =>
+                handleConfirmPurchase(selectedTicket, ticketCounts[selectedTicket.eventId], selectedTicket.eventTitle, String(totalPrice(selectedTicket)))
+              }>
+                Confirm
+              </Button>
+            </Modal.Footer>
+          </Modal>
         )}
         <Footer />
       </div></>

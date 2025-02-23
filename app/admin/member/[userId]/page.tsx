@@ -10,7 +10,7 @@ const MemberPage = async ({ params }: { params: Promise<{ userId: string }> }) =
     const userInfo = (await getUserById(userId)) as User
 
     // user information not exist redirect to error page
-    if(userInfo && !userInfo?.userId) {
+    if (userInfo && !userInfo?.userId) {
         redirect("/error/not-authorized")
     }
 
