@@ -142,6 +142,7 @@ const PageContent = () => {
                           style={{ maxHeight: '250px', objectFit: 'cover' }}
                           height={250}
                           width={1000}
+                          priority
                         />
                       </div>
 
