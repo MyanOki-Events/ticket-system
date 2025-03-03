@@ -3,19 +3,26 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./login.module.css";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { Suspense, useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@/app/common/styles/globals.css';
 import Image from 'next/image';
+import { useAuth } from "./contexts/AuthContext";
+// import LoadingLayout from "./components/LoadingLayout";
 
 const LoginForm = () => {
   const { data: session, status } = useSession()
-  const searchParams = useSearchParams();
   const router = useRouter()
+  // Redirect url get from param
+  const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
+
   // State to handle modal visibility
   const [showModal, setShowModal] = useState(false);
+
+  // get functions from Wrapper Auth
+  const { login } = useAuth()
 
   // If already authenticated redirect booking
   useEffect(() => {
@@ -30,10 +37,12 @@ const LoginForm = () => {
   }, [status, router]);
 
   // Login Handle
-  const handleSignIn = async () => {
-    await signIn("google", { callbackUrl: "/" });
+  const handleSignIn = () => {
+    login()
   };
 
+  // ✅ User Poilcy Handle
+  // Code Start
   const handleCloseModal = () => {
     setShowModal(false);
   };
@@ -41,6 +50,12 @@ const LoginForm = () => {
   const handleShowModal = () => {
     setShowModal(true);
   };
+  // Code End
+  // ✅ User Poilcy Handle
+
+  // if (loading) {
+  //   return LoadingLayout()
+  // }
 
   return (
     <div className="container" style={{ minHeight: '100vh' }}>
@@ -71,7 +86,7 @@ const LoginForm = () => {
                 </div>
               </form>
               {/* User Policy Link */}
-              <div className="mt-4 text-center" style={{ fontSize: '1rem'}}>
+              <div className="mt-4 text-center" style={{ fontSize: '1rem' }}>
                 <p>
                   By signing in, you agree to our{" "}
                   <button

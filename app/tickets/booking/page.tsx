@@ -14,6 +14,8 @@ import { addNewTickets } from "@/app/services/ticket_service";
 import MessageAlert from '@/app/components/MessageAlert';
 import Event from '@/app/dao/event';
 import { getAllEvent } from '@/app/services/event_services';
+import { useAuth } from '@/app/contexts/AuthContext';
+import LoadingLayout from '@/app/components/LoadingLayout';
 
 const TicketsPage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -22,6 +24,7 @@ const TicketsPage = () => {
   const [message, setMessage] = useState<string>(''); // Info or success message
   const [error, setError] = useState<string>(''); // Error message
   const [tickets, setTickets] = useState<Event[]>([]);
+  const { loading } = useAuth()
 
   // State for the modal, to display selected ticket information
   const [selectedTicket, setSelectedTicket] = useState<Event | null>(null);
@@ -172,129 +175,137 @@ const TicketsPage = () => {
   }, [session, getAllEvent, ticketCounts])
 
   return (
-    <><div ><Header /></div>
-      <div className="container" style={{ padding: '20px', backgroundColor: '#f8f9fa' }}>
-        <h3 className="text-center" style={{ paddingTop: '60px', color: '#2a9d8f' }}>List of Available Tickets</h3>
-        {/* Info or Error Message */}
-        <MessageAlert message={message} type="info" />
-        <MessageAlert message={error} type="danger" />
-        <div className="row mt-4">
-          <div className="col-md-6 offset-md-3">
-            {tickets.map((ticket, index) => (
-              <div key={index} className="card shadow mb-4">
-                <div className="card-body text-center">
-                  <h6 className="card-title">{ticket.eventTitle} Admission Ticket</h6>
-                  <div className="mt-4 mb-4">
-                    <div className="d-flex flex-column align-items-center">
-                      <div className="d-flex align-items-center mb-3">
-                        <i className="bi bi-calendar-event text-primary me-3" style={{ fontSize: '24px' }}></i>
-                        <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
-                          {ticket.eventDate}
-                        </p>
+    <>
+      <Header />
+
+      {
+        loading ?
+          <LoadingLayout /> :
+          <div className="container" style={{ padding: '20px', backgroundColor: '#f8f9fa' }}>
+            <h3 className="text-center" style={{ paddingTop: '60px', color: '#2a9d8f' }}>List of Available Tickets</h3>
+            {/* Info or Error Message */}
+            <MessageAlert message={message} type="info" />
+            <MessageAlert message={error} type="danger" />
+            <div className="row mt-4">
+              <div className="col-md-6 offset-md-3">
+                {tickets.map((ticket, index) => (
+                  <div key={index} className="card shadow mb-4">
+                    <div className="card-body text-center">
+                      <h6 className="card-title">{ticket.eventTitle} Admission Ticket</h6>
+                      <div className="mt-4 mb-4">
+                        <div className="d-flex flex-column align-items-center">
+                          <div className="d-flex align-items-center mb-3">
+                            <i className="bi bi-calendar-event text-primary me-3" style={{ fontSize: '24px' }}></i>
+                            <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
+                              {ticket.eventDate}
+                            </p>
+                          </div>
+                          <div className="d-flex align-items-center mb-3" style={{ lineHeight: '1' }}>
+                            <i className="bi bi-clock text-warning me-3" style={{ fontSize: '24px' }}></i>
+                            <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
+                              {ticket.eventTime}
+                            </p>
+                          </div>
+                          <div className="d-flex align-items-center" style={{ lineHeight: '1' }}>
+                            <i className="bi bi-geo-alt text-success me-3" style={{ fontSize: '24px' }}></i>
+                            <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
+                              {ticket.location}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="d-flex align-items-center mb-3" style={{ lineHeight: '1' }}>
-                        <i className="bi bi-clock text-warning me-3" style={{ fontSize: '24px' }}></i>
-                        <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
-                          {ticket.eventTime}
-                        </p>
+                      <p className="card-text" style={{ fontSize: '12px' }}>
+                        <strong>Price per ticket: &#165;{ticket.price}</strong>
+                      </p>
+                      <div className="input-group">
+                        <button
+                          className="btn btn-outline-secondary"
+                          type="button"
+                          onClick={() => handleTicketCountChange(ticket.eventId, -1)}
+                        >
+                          -
+                        </button>
+                        <input
+                          type="text"
+                          className="form-control text-center"
+                          // value={ticketCounts[ticket.eventId]}
+                          value={ticketCounts[ticket.eventId] ?? 0}
+                          readOnly
+                        />
+                        <button
+                          className="btn btn-outline-secondary"
+                          type="button"
+                          onClick={() => handleTicketCountChange(ticket.eventId, 1)}
+                        >
+                          +
+                        </button>
                       </div>
-                      <div className="d-flex align-items-center" style={{ lineHeight: '1' }}>
-                        <i className="bi bi-geo-alt text-success me-3" style={{ fontSize: '24px' }}></i>
-                        <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
-                          {ticket.location}
-                        </p>
-                      </div>
+                      <button className="btn btn-outline-danger mt-3 me-2" onClick={() => handleReset(ticket.eventId)}>
+                        Reset
+                      </button>
+                      <button className="btn btn-primary mt-3" onClick={() => handlePurchase(ticket)} disabled={(ticketCounts[ticket.eventId] && ticketCounts[ticket.eventId] > 0) ? false : true}>
+                        Reserve
+                      </button>
                     </div>
                   </div>
-                  <p className="card-text" style={{ fontSize: '12px' }}>
-                    <strong>Price per ticket: &#165;{ticket.price}</strong>
-                  </p>
-                  <div className="input-group">
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={() => handleTicketCountChange(ticket.eventId, -1)}
-                    >
-                      -
-                    </button>
-                    <input
-                      type="text"
-                      className="form-control text-center"
-                      // value={ticketCounts[ticket.eventId]}
-                      value={ticketCounts[ticket.eventId] ?? 0}
-                      readOnly
-                    />
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={() => handleTicketCountChange(ticket.eventId, 1)}
-                    >
-                      +
-                    </button>
+                ))}
+              </div>
+            </div>
+            {/* Modal for Ticket Purchase Confirmation */}
+            {selectedTicket && (
+              <Modal
+                show={showModal}
+                onHide={() => setShowModal(false)}
+                centered
+                size="lg"
+                backdrop="static"
+              >
+                <Modal.Header closeButton className="bg-primary text-white">
+                  <Modal.Title style={{ fontSize: '18px' }}>Confirm Your Purchase</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="bg-light py-4 px-5">
+                  <div className="mb-4">
+                    <h5 className="text-dark mb-2" style={{ fontSize: '16px' }}>
+                      Are you sure you want to purchase {ticketCounts[selectedTicket.eventId]} tickets?
+                    </h5>
+                    <p className="text-muted mb-1" style={{ fontSize: '14px' }}>
+                      <strong>Ticket Type:</strong> {selectedTicket.eventTitle}
+                    </p>
+                    <p className="text-muted mb-1" style={{ fontSize: '14px' }}>
+                      <strong>Total Price:</strong> &#165;{totalPrice(selectedTicket)}
+                    </p>
                   </div>
-                  <button className="btn btn-outline-danger mt-3 me-2" onClick={() => handleReset(ticket.eventId)}>
-                    Reset
-                  </button>
-                  <button className="btn btn-primary mt-3" onClick={() => handlePurchase(ticket)} disabled={(ticketCounts[ticket.eventId] && ticketCounts[ticket.eventId] > 0) ? false : true}>
-                    Reserve
-                  </button>
-                </div>
-              </div>
-            ))}
+                  <Form.Group>
+                    <Form.Label className="text-dark" style={{ fontSize: '14px' }}>Payment Method</Form.Label>
+                    <Form.Control
+                      as="select"
+                      value={paymentMethod}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="shadow-sm"
+                      style={{ fontSize: '14px' }}
+                    >
+                      <option>Bank Transfer</option>
+                      <option>In Person</option>
+                    </Form.Control>
+                  </Form.Group>
+                </Modal.Body>
+                <Modal.Footer className="bg-light py-3">
+                  <Button variant="secondary" onClick={() => setShowModal(false)}>
+                    Cancel
+                  </Button>
+                  <Button variant="primary" onClick={() =>
+                    handleConfirmPurchase(selectedTicket, ticketCounts[selectedTicket.eventId], selectedTicket.eventTitle, String(totalPrice(selectedTicket)))
+                  }>
+                    Confirm
+                  </Button>
+                </Modal.Footer>
+              </Modal>
+            )}
           </div>
-        </div>
-        {/* Modal for Ticket Purchase Confirmation */}
-        {selectedTicket && (
-          <Modal
-            show={showModal}
-            onHide={() => setShowModal(false)}
-            centered
-            size="lg"
-            backdrop="static"
-          >
-            <Modal.Header closeButton className="bg-primary text-white">
-              <Modal.Title style={{ fontSize: '18px' }}>Confirm Your Purchase</Modal.Title>
-            </Modal.Header>
-            <Modal.Body className="bg-light py-4 px-5">
-              <div className="mb-4">
-                <h5 className="text-dark mb-2" style={{ fontSize: '16px' }}>
-                  Are you sure you want to purchase {ticketCounts[selectedTicket.eventId]} tickets?
-                </h5>
-                <p className="text-muted mb-1" style={{ fontSize: '14px' }}>
-                  <strong>Ticket Type:</strong> {selectedTicket.eventTitle}
-                </p>
-                <p className="text-muted mb-1" style={{ fontSize: '14px' }}>
-                  <strong>Total Price:</strong> &#165;{totalPrice(selectedTicket)}
-                </p>
-              </div>
-              <Form.Group>
-                <Form.Label className="text-dark" style={{ fontSize: '14px' }}>Payment Method</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="shadow-sm"
-                  style={{ fontSize: '14px' }}
-                >
-                  <option>Bank Transfer</option>
-                  <option>In Person</option>
-                </Form.Control>
-              </Form.Group>
-            </Modal.Body>
-            <Modal.Footer className="bg-light py-3">
-              <Button variant="secondary" onClick={() => setShowModal(false)}>
-                Cancel
-              </Button>
-              <Button variant="primary" onClick={() =>
-                handleConfirmPurchase(selectedTicket, ticketCounts[selectedTicket.eventId], selectedTicket.eventTitle, String(totalPrice(selectedTicket)))
-              }>
-                Confirm
-              </Button>
-            </Modal.Footer>
-          </Modal>
-        )}
-        <Footer />
-      </div></>
+      }
+
+      <Footer />
+    </>
   );
 };
 

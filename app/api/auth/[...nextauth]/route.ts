@@ -1,4 +1,5 @@
 import { loginProcess } from "@/app/services/login_service";
+import { signInWithFirebase } from "@/app/utils/firebase_auth_async";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -11,8 +12,19 @@ function nextAuthOptions(): NextAuthOptions {
         clientSecret: process.env.GOOGLE_CLIENT_SECRET!
       })
     ],
+    session: {
+      strategy: "jwt",
+      maxAge: 60 * 30
+    },
+    jwt: {
+      maxAge: 60 * 30
+    },
     callbacks: {
       async jwt({ token, account, user }) {
+        if (account?.id_token) {
+          token.idToken = account.id_token
+        }
+
         // signIn user data save in token
         if (user) {
           token.userId = user.userId;
@@ -25,6 +37,7 @@ function nextAuthOptions(): NextAuthOptions {
         if (session.user) {
           session.user.userId = token.userId
           session.user.role = token.role
+          session.user.idToken = token.idToken
         }
         return session;
       },
@@ -33,6 +46,15 @@ function nextAuthOptions(): NextAuthOptions {
         if (!user.email?.endsWith('@gmail.com')) {
           return false; // Reject non-Gmail users
         }
+
+        // Save User Credential
+        if (!account?.id_token) {
+          return false
+        }
+
+        // make firebase account authorization
+        await signInWithFirebase(account.id_token)
+
         // You can add further logic here if needed (e.g., reject non-admin users)
         const loginUser = await loginProcess(user)
         if (!loginUser) {
@@ -55,8 +77,8 @@ function nextAuthOptions(): NextAuthOptions {
       async session(message) {
         console.log('Session Active : ');
       },
-    }
-
+    },
+    secret: process.env.NEXTAUTH_SECRET,
   }
 }
 

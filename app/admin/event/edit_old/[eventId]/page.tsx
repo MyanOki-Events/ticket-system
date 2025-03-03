@@ -1,7 +1,6 @@
 import EventEditFormLayout from "@/app/components/EventEditFormLayout";
-import Header from "@/app/components/Header";
 import Event from "@/app/dao/event";
-import { addNewEvent, getEventById } from "@/app/services/event_services";
+import { getEventById } from "@/app/services/event_services";
 import { redirect } from "next/navigation"
 
 const EventEditPage = async ({ params }: { params: Promise<{ eventId: string }> }) => {
@@ -20,7 +19,6 @@ const EventEditPage = async ({ params }: { params: Promise<{ eventId: string }> 
 
     return (
         <>
-            <div><Header /></div>
             <EventEditFormLayout eventInfo={eventInfo} />
         </>
     )

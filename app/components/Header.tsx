@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { signOut, useSession } from "next-auth/react";
 import '../common/styles/globals.css';
 import { usePathname } from 'next/navigation';
+import { signOutFromFirebase } from "../utils/firebase_auth_async";
 
 const Header = ({ }) => {
   const [activeItem, setActiveItem] = useState('booking');
@@ -19,7 +20,7 @@ const Header = ({ }) => {
       setActiveItem('detail');
     } else if (pathname === '/admin/event' || pathname === '/admin/event/add_new' || pathname.includes('/admin/event/edit_old')) {
       setActiveItem('event');
-    } else if (pathname === '/admin') {
+    } else if (pathname === '/admin' || pathname.includes('/admin/member')) {
       setActiveItem('admin');
     }
   }, [pathname]);
@@ -29,8 +30,9 @@ const Header = ({ }) => {
     setActiveItem(section);
   };
 
-  const handleLogout = () => {
-    signOut({ callbackUrl: "/" });
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/" });
+    await signOutFromFirebase()
   };
 
   return (

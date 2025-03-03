@@ -4,14 +4,20 @@ import { useCallback, useEffect, useState } from "react";
 import { deleteTicketByIds, getTicketsByUserId, updateTicketByIds } from "../services/ticket_service";
 import Ticket from "../dao/ticket";
 import { convertDate } from "../utils/date_fromat/date_format";
+import { User } from "../dao/user";
+import { useAuth } from "../contexts/AuthContext";
+import Header from "./Header";
+import Footer from "./Footer";
+import LoadingLayout from "./LoadingLayout";
 
-const TicketLayout = ({ userId }: { userId: string }) => {
+const TicketLayout = ({ userInfo }: { userInfo: User }) => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
+  const { loading } = useAuth();
   const _getTicketsByUserId = useCallback(async () => {
-    await getTicketsByUserId(userId, (res) => {
+    await getTicketsByUserId(userInfo.userId, (res) => {
       if (res) {
         const usersArray = Object.entries(res).map(([key, value]) => ({
-          userId: userId,
+          userId: userInfo.userId,
           ticketId: key,
           ...(value as any),
         }));
@@ -27,52 +33,67 @@ const TicketLayout = ({ userId }: { userId: string }) => {
   }, [_getTicketsByUserId])
 
   const deleteTicketById = async (ticketId: string) => {
-    await deleteTicketByIds(userId, ticketId)
+    await deleteTicketByIds(userInfo.userId, ticketId)
   }
 
   const updatePaidState = async (ticketId: string, flag: boolean) => {
-    updateTicketByIds(userId, ticketId, { "isPaid": flag })
+    updateTicketByIds(userInfo.userId, ticketId, { "isPaid": flag })
   }
 
   return (
-    <div>
-      <div className="overflow-x-scroll">
-        <table className="table table-sm table-bordered border-dark">
-          <thead>
-            <tr>
-              <th>Ticket Id</th>
-              <th>Paid</th>
-              <th>Used</th>
-              <th>Created</th>
-              <th>Updated</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              tickets.map((ticket) => (
-                <tr key={ticket.ticketId}>
-                  <td>{ticket.ticketId}</td>
-                  <td>
-                    {ticket.isPaid ?
-                      <button onClick={() => updatePaidState(ticket.ticketId, false)} className="btn btn-success">YES</button> :
-                      <button onClick={() => updatePaidState(ticket.ticketId, true)} className="btn btn-danger">NOT</button>}
-                  </td>
-                  <td>{ticket.isUsed ? "YES" : "NO"}</td>
-                  <td>{convertDate(ticket.created ?? 0)}</td>
-                  <td>{convertDate(ticket.updated ?? 0)}</td>
-                  <td>
-                    <span onClick={async () => deleteTicketById(ticket.ticketId)}>
-                      <i className="bi bi-trash3"></i>
-                    </span>
-                  </td>
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <>
+      <Header />
+      {
+        loading ?
+          <LoadingLayout /> :
+          <div className="container">
+            <div>
+              <h2 style={{ paddingTop: '60px', color: '#2a9d8f' }}>Member</h2>
+              <h5>Name : {userInfo.name}</h5>
+              <h5>Email : {userInfo.email}</h5>
+            </div>
+            <>
+              <div className="overflow-x-scroll">
+                <table className="table table-sm table-bordered border-dark">
+                  <thead>
+                    <tr>
+                      <th>Ticket Id</th>
+                      <th>Paid</th>
+                      <th>Used</th>
+                      <th>Created</th>
+                      <th>Updated</th>
+                      <th>Delete</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {
+                      tickets.map((ticket) => (
+                        <tr key={ticket.ticketId}>
+                          <td>{ticket.ticketId}</td>
+                          <td>
+                            {ticket.isPaid ?
+                              <button onClick={() => updatePaidState(ticket.ticketId, false)} className="btn btn-success">YES</button> :
+                              <button onClick={() => updatePaidState(ticket.ticketId, true)} className="btn btn-danger">NOT</button>}
+                          </td>
+                          <td>{ticket.isUsed ? "YES" : "NO"}</td>
+                          <td>{convertDate(ticket.created ?? 0)}</td>
+                          <td>{convertDate(ticket.updated ?? 0)}</td>
+                          <td>
+                            <span onClick={async () => deleteTicketById(ticket.ticketId)}>
+                              <i className="bi bi-trash3"></i>
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </>
+          </div>
+      }
+      <Footer />
+    </>
   );
 };
 

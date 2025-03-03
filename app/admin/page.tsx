@@ -9,10 +9,13 @@ import { useSession } from "next-auth/react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
+import { useAuth } from "../contexts/AuthContext";
+import LoadingLayout from "../components/LoadingLayout";
 
 const AdminPage = () => {
   const { data: session } = useSession();
   const [users, setUsers] = useState<User[]>([]);
+  const { loading } = useAuth()
 
   useEffect(() => {
     getAllUsers()
@@ -28,40 +31,47 @@ const AdminPage = () => {
   }
 
   return (
-    <><div ><Header />
-    <div className="container" style={{ padding: '20px' }}>
-      <h1 className="text-center text-dark" style={{ paddingTop: '60px' }}>Admin Dashboard</h1>
+    <>
+      <Header />
 
-      <section>
-        <h3 className="text-dark">All Users</h3>
-        <div className="overflow-x-scroll">
-          <table className="table table-sm table-bordered border-dark">
-            <thead>
-              <tr>
-                <th>User Name</th>
-                <th>Email</th>
-                <th>Detail</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.userId} onClick={async () => await handleClick(user.userId)}>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>
-                    <Link href={`admin/member/${user.userId}`}>
-                      <i className="bi bi-clipboard-data"></i>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
-    <Footer />
-    </div></>
+      {
+        loading ?
+          <LoadingLayout /> :
+          <div className="container" style={{ padding: '20px' }}>
+            <h1 className="text-center text-dark" style={{ paddingTop: '60px' }}>Admin Dashboard</h1>
+
+            <section>
+              <h3 className="text-dark">All Users</h3>
+              <div className="overflow-x-scroll">
+                <table className="table table-sm table-bordered border-dark">
+                  <thead>
+                    <tr>
+                      <th>User Name</th>
+                      <th>Email</th>
+                      <th>Detail</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((user) => (
+                      <tr key={user.userId} onClick={async () => await handleClick(user.userId)}>
+                        <td>{user.name}</td>
+                        <td>{user.email}</td>
+                        <td>
+                          <Link href={`admin/member/${user.userId}`}>
+                            <i className="bi bi-clipboard-data"></i>
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+      }
+
+      <Footer />
+    </>
   );
 };
 

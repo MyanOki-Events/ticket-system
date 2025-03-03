@@ -14,17 +14,13 @@ const MemberPage = async ({ params }: { params: Promise<{ userId: string }> }) =
         redirect("/error/not-authorized")
     }
 
+    userInfo.created = ""
+    userInfo.updated = ""
+
     return (
-        <div className="container">
-            <div>
-                <h2>Member</h2>
-                <h5>Name : {userInfo.name}</h5>
-                <h5>Email : {userInfo.email}</h5>
-            </div>
-            <div>
-                <TicketLayout userId={userInfo.userId} />
-            </div>
-        </div>
+        <>
+            <TicketLayout userInfo={userInfo} />
+        </>
     )
 }
 

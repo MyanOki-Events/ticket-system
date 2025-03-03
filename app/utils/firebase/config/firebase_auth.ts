@@ -1,6 +1,8 @@
 import { iniApp } from "./firebase_app";
-import { getAuth } from "firebase/auth";
+import { browserLocalPersistence, getAuth, setPersistence } from "firebase/auth";
 
 const auth = getAuth(iniApp);
+
+setPersistence(auth, browserLocalPersistence)
 
 export { auth }

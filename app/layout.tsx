@@ -4,7 +4,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./globals.css";
 import { Providers } from './Providers'
-import SessionGuard from './components/SessionGuard'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,14 +26,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-      <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable}`}>
-          <Providers>
-            <SessionGuard>
-              {children}
-            </SessionGuard>
-          </Providers>
-        </body>
-      </html>
+    <html lang="en">
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <Providers>
+          {children}
+        </Providers>
+      </body>
+    </html>
   );
 }
