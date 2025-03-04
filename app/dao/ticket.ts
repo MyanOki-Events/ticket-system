@@ -5,6 +5,9 @@ export default class Ticket {
     // DocumentIdをticketIdとして使う
     ticketId: string
 
+    // Auto Increment Id
+    ticketNo: string
+
     // チケットの使い済みか否か判定フラグ
     isUsed: boolean
 
@@ -18,8 +21,9 @@ export default class Ticket {
 
     updated: any
 
-    constructor(userId: string, ticketId: string = "", created: any = "", updated: any = "", isUsed: boolean = false, isPaid = false, ticketType: string = "") {
+    constructor(userId: string, ticketNo: string = "", ticketId: string = "", created: any = "", updated: any = "", isUsed: boolean = false, isPaid = false, ticketType: string = "") {
         this.userId = userId
+        this.ticketNo = ticketNo
         this.ticketId = ticketId
         this.isUsed = isUsed
         this.isPaid = isPaid

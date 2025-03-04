@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const { to, bookingDate, amountPaid, paymentMethod, ticketType, ticketId, ticketCount, customerName } = await req.json();
+    const { to, bookingDate, amountPaid, paymentMethod, ticketType, ticketIds, ticketCount, customerName } = await req.json();
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -28,8 +28,8 @@ export async function POST(req: Request) {
           },
           "ticketDetails": {
             "ticketType": "Ticket Type: [Ticket Type]",
-            // "ticketId": "Ticket ID: [Ticket ID]",
-            "ticketCount" : "Number of Tickets : [Ticket Count]"
+            "ticketIds": "Ticket Ids: [Ticket Ids]",
+            "ticketCount": "Number of Tickets : [Ticket Count]"
           },
           "confirmation": "Your ticket is now confirmed! Thank you for your bookings. We would like to request you to complete payment until the event date or as soon as possible.",
           "questions": "If you have any questions or need assistance, feel free to reach out to us.",
@@ -49,13 +49,13 @@ export async function POST(req: Request) {
     emailText += `${emailBody.paymentSummary.amountPaid.replace('[Amount Paid]', amountPaid)}\n`;
     emailText += `${emailBody.paymentSummary.paymentMethod.replace('[Payment Method]', paymentMethod)}\n\n`;
     emailText += `${emailBody.ticketDetails.ticketType.replace('[Ticket Type]', ticketType)}\n`;
-    // emailText += `${emailBody.ticketDetails.ticketId.replace('[Ticket ID]', ticketId)}\n`;
+    emailText += `${emailBody.ticketDetails.ticketIds.replace('[Ticket Ids]', ticketIds)}\n`;
     emailText += `${emailBody.ticketDetails.ticketCount.replace('[Ticket Count]', ticketCount)}\n\n`;
     emailText += emailBody.confirmation + '\n\n';
     emailText += emailBody.questions + '\n\n';
     emailText += emailBody.closing + '\n\n';
     emailText += emailBody.signature;
-    
+
     const mailOptions = {
       from: process.env.GMAIL_EMAIL,
       to: to,
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
 
     // Send the email
     await transporter.sendMail(mailOptions);
-    
+
     // Respond with success
     return NextResponse.json({ message: 'Email sent successfully' }, { status: 200 });
   } catch (error) {

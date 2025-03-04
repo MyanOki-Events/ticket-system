@@ -1,13 +1,17 @@
 import { serverTimestamp } from "firebase/database"
 import Ticket from "../dao/ticket"
-import { addRealTimeData, readRealTimeData, deleteRealTimeData, updateRealTimeData } from "../utils/firebase/if/firebase_realtime_db_if"
+import { addRealTimeData, readRealTimeData, deleteRealTimeData, updateRealTimeData, addNewItemWithIcId } from "../utils/firebase/if/firebase_realtime_db_if"
 
-const addNewTickets = async (uId: string, totalTicket: number = 1) => {
-    const path: string = `users/${uId}/tickets`
+const addNewTickets = async (uId: string, eventId: string, totalTicket: number = 1) => {
+    // const path: string = `tickets`
+    const counterPath: string = `metadata/${eventId}/ticketLastId`
+    const dataPath: string = `users/${uId}/tickets`
     const ticket: Ticket = new Ticket(uId)
-    let { userId, ticketId, ...other } = ticket
+    let { userId, ticketNo, ticketId, ...other } = ticket
+    other.ticketType = eventId
     other.created = serverTimestamp()
-    await addRealTimeData(path, other, totalTicket)
+    return await addNewItemWithIcId(counterPath, dataPath, other, totalTicket)
+    // await addRealTimeData(path, other, totalTicket)
 }
 
 const getTicketsByUserId = async (userId: string, callback: (data: any) => void) => {
@@ -28,7 +32,7 @@ const deleteTicketByIds = async (userId: string, ticketId: string) => {
 const updateTicketByIds = async (userId: string, ticketId: string, data: any) => {
     const path: string = `users/${userId}/tickets/${ticketId}`
     const updated = serverTimestamp()
-    const other = {"updated" : updated, ...data}
+    const other = { "updated": updated, ...data }
     await updateRealTimeData(path, other)
 }
 

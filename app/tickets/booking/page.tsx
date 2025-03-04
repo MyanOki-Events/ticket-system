@@ -23,7 +23,7 @@ const TicketsPage = () => {
   const router = useRouter();
   const [message, setMessage] = useState<string>(''); // Info or success message
   const [error, setError] = useState<string>(''); // Error message
-  const [tickets, setTickets] = useState<Event[]>([]);
+  const [eventTickets, setEventTickets] = useState<Event[]>([]);
   const { loading } = useAuth()
 
   // State for the modal, to display selected ticket information
@@ -58,7 +58,7 @@ const TicketsPage = () => {
         };
       } else {
         // Reset all ticket counts
-        return tickets.reduce((acc, ticket) => {
+        return eventTickets.reduce((acc, ticket) => {
           acc[ticket.eventId] = 0;
           return acc;
         }, {} as { [ticketId: string]: number });
@@ -81,7 +81,8 @@ const TicketsPage = () => {
     try {
       // TODO after craete event Table , replace with following code
       //await addNewTickets(userId, ticket.id, ticketCount); 
-      await addNewTickets(userId, ticketCount);
+      const ticketIds: [] = await addNewTickets(userId, ticket.eventId, ticketCount);
+      const ticketNumbers = ticketIds.map((data) => (data ?? 0) < 10 ? `000${data}` : data < 100 ? `00${data}` : data < 1000 ? `0${data}` : `${data}`).join(", ")
       // send email to ticket purchaser
       // TODO change ticketId value
       const currentDate = new Date();
@@ -96,10 +97,11 @@ const TicketsPage = () => {
       console.log('Total Price' + totalPrice);
       console.log('Payment Method' + paymentMethod);
       console.log('Ticket Type' + ticketType);
+      console.log('Ticket ticketNumbers' + ticketNumbers);
       console.log('Ticket Count' + ticketCount);
 
       sendEmail(String(session?.user.email),
-        String(session?.user.name), String(formattedDate), String(totalPrice), paymentMethod, ticketType, ticket.eventCode, String(ticketCount));
+        String(session?.user.name), String(formattedDate), String(totalPrice), paymentMethod, ticketType, /* ticket.eventCode */ ticketNumbers, String(ticketCount));
       router.push(`/tickets/detail?purchaseStatus=success`);
     } catch (error) {
       setError('Unexpected error is occured.Please try again');
@@ -115,7 +117,7 @@ const TicketsPage = () => {
     amountPaid: string,
     paymentMethod: string,
     ticketType: string,
-    ticketId: string,
+    ticketIds: string,
     ticketCount: string
 
   ) {
@@ -133,7 +135,7 @@ const TicketsPage = () => {
           amountPaid: amountPaid,
           paymentMethod: paymentMethod,
           ticketType: ticketType,
-          // ticketId: ticketId,
+          ticketIds: ticketIds,
           ticketCount: ticketCount
         }),
       });
@@ -159,13 +161,13 @@ const TicketsPage = () => {
 
     getAllEvent()
       .then((res) => {
-        setTickets(res)
+        setEventTickets(res)
 
         // set init value for event ticket
         const count = Object.keys(ticketCounts)
         if (count && count.length === 0) {
           let data: { [key: string]: number } = {}
-          tickets.map((eve) => {
+          eventTickets.map((eve) => {
             data[eve.eventId] = 0
           })
           setTicketCounts(data)
@@ -188,7 +190,7 @@ const TicketsPage = () => {
             <MessageAlert message={error} type="danger" />
             <div className="row mt-4">
               <div className="col-md-6 offset-md-3">
-                {tickets.map((ticket, index) => (
+                {eventTickets.map((ticket, index) => (
                   <div key={index} className="card shadow mb-4">
                     <div className="card-body text-center">
                       <h6 className="card-title">{ticket.eventTitle} Admission Ticket</h6>

@@ -16,6 +16,8 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from "@/app/contexts/AuthContext";
 import LoadingLayout from "@/app/components/LoadingLayout";
+import { getAllEvent } from "@/app/services/event_services";
+import Event from "@/app/dao/event";
 
 const PageContent = () => {
   const { data: session } = useSession()
@@ -29,6 +31,7 @@ const PageContent = () => {
   const [autoIncrementedTickets, setAutoIncrementedTickets] = useState<{ ticketType: string, tickets: (Ticket & { autoIncrementedId: number })[] }[]>([]);
   const searchParams = useSearchParams();
   const purchaseStatus = searchParams.get('purchaseStatus');
+  const [eventTickets, setEventTickets] = useState<Event[]>([]);
 
   // チケットデータが変更されたときにグループ化とID付けを実行
   useEffect(() => {
@@ -79,17 +82,27 @@ const PageContent = () => {
   const _getTicketsByUserId = useCallback(async () => {
     await getTicketsByUserId(userId, (res) => {
       if (res) {
-        const usersArray = Object.entries(res).map(([key, value]) => ({
-          userId: userId,
-          ticketId: key,
-          ...(value as any),
-        }));
-        setTickets(usersArray as Ticket[])
+        const ticketsArray = Object.entries(res).map(([key, value]) => {
+          const { autoId, ...other } = (value as any)
+          const ticketNo = autoId < 10 ? `000${autoId}` : autoId < 100 ? `00${autoId}` : autoId < 1000 ? `0${autoId}` : `${autoId}`
+          return ({
+            userId: userId,
+            ticketNo: ticketNo,
+            ticketId: key,
+            ...other
+          });
+        });
+        setTickets(ticketsArray as Ticket[])
       } else {
         setTickets([])
       }
     })
   }, [session, getTicketsByUserId, baseUrl])
+
+  useEffect(() => {
+    getAllEvent()
+      .then((result) => setEventTickets(result))
+  })
 
   useEffect(() => {
     _getTicketsByUserId()
@@ -127,14 +140,15 @@ const PageContent = () => {
                       <div className="card shadow-lg rounded-3 ticket-card" style={{ position: 'relative', userSelect: 'none', overflow: 'hidden' }}>
                         <div className="d-flex justify-content-between align-items-center p-2">
                           <span className="beautiful-header text-dark" style={{ fontSize: '20px' }}>
-                            {ticket.ticketType} ({ticket.autoIncrementedId}) {/* 自動ID */}
+                            Ticket No : {ticket.ticketNo}
+                            {/* {ticket.ticketType} ({ticket.autoIncrementedId}) 自動ID */}
                           </span>
                           {ticket.isPaid ? (
                             <button className="btn btn-delete" disabled>
                               Delete <i className="bi bi-trash"></i>
                             </button>
                           ) : (
-                            <button className="btn btn-delete" onClick={() => handleButtonClick(ticket.ticketId)}>
+                            <button className="btn btn-delete" onClick={() => handleButtonClick(ticket.ticketNo)}>
                               Delete <i className="bi bi-trash"></i>
                             </button>
                           )}
@@ -158,17 +172,17 @@ const PageContent = () => {
                           <div className="col-md-5 d-flex">
                             <div className="card-body">
                               <h5 className="card-title text-center" style={{ fontWeight: 'bold', color: '#2c3e50', fontSize: '15px' }}>
-                                Water Festival
+                                {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventTitle}
                               </h5>
                               <table className="table table-bordered" style={{ border: '2px solid #3498db', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
                                 <tbody>
                                   <tr>
-                                    <td style={{ fontSize: '0.8rem' }}><strong>Date:</strong> 20th October 2025</td>
-                                    <td style={{ fontSize: '0.8rem' }}><strong>Place:</strong> Thadingyut Event Hall, Yangon</td>
+                                    <td style={{ fontSize: '0.8rem' }}><strong>Date:</strong> {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventDate}</td>
+                                    <td style={{ fontSize: '0.8rem' }}><strong>Place:</strong> {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.location}</td>
                                   </tr>
                                   <tr>
-                                    <td style={{ fontSize: '0.8rem' }}><strong>Time:</strong> 10:00 AM - 4:00 PM</td>
-                                    <td style={{ fontSize: '0.8rem' }}><strong>Address:</strong> 123 Festival Street, Yangon</td>
+                                    <td style={{ fontSize: '0.8rem' }}><strong>Time:</strong> {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventTime}</td>
+                                    <td style={{ fontSize: '0.8rem' }}><strong>Address:</strong> {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.location}</td>
                                   </tr>
                                   <tr>
                                     <td colSpan={2} className="text-center" style={{ fontSize: '0.8rem' }}>
@@ -201,7 +215,7 @@ const PageContent = () => {
                             <div style={{ textAlign: 'center', marginTop: '20px' }}>
                               <p style={{ fontSize: '14px', fontWeight: 'bold', color: '#333' }}>QR For Scan</p>
                               <QRCodeCanvas value={`${baseUrl}/admin/qrcode_ticket/${ticket.userId}/${ticket.ticketId}`} size={150} />
-                              <p style={{ fontSize: '10px' }}>[Bussiness Use] ID ({ticket.ticketId})</p>
+                              <p style={{ fontSize: '10px' }}>[Bussiness Use] ID ({ticket.ticketNo})</p>
                             </div>
 
                           </div>
