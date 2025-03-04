@@ -24,7 +24,7 @@ const PageContent = () => {
   const userId: string = session?.user.userId ?? ""
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [selectedTicketId, setSelectedTicketId] = useState<string>('');
+  const [selectedTicketId, setSelectedTicketId] = useState<Map<string, string>>();
   const baseUrl: string = process.env.NEXT_PUBLIC_BASE_URL ?? ""
   const [message, setMessage] = useState<string>(''); // Info or success message
   const [error, setError] = useState<string>(''); // Error message
@@ -54,12 +54,19 @@ const PageContent = () => {
     setAutoIncrementedTickets(updatedTickets);
   }, [tickets]);
 
-  const handleButtonClick = (id: string) => {
-    setSelectedTicketId(id);
+  const handleButtonClick = (ticketNo: string, ticketId: string) => {
+    let data: Map<string, string> = new Map()
+    data.set("ticketNo", ticketNo)
+    data.set("ticketId", ticketId)
+    setSelectedTicketId(data);
     setShowModal(true);
   };
 
   const handleDelete = (id: string) => {
+    // Disable Delete
+    if (id === "") {
+      return;
+    }
     console.log('Delete Id ' + id);
     setShowModal(false);
     try {
@@ -148,7 +155,7 @@ const PageContent = () => {
                               Delete <i className="bi bi-trash"></i>
                             </button>
                           ) : (
-                            <button className="btn btn-delete" onClick={() => handleButtonClick(ticket.ticketNo)}>
+                            <button className="btn btn-delete" onClick={() => handleButtonClick(ticket.ticketNo, ticket.ticketId)}>
                               Delete <i className="bi bi-trash"></i>
                             </button>
                           )}
@@ -241,14 +248,14 @@ const PageContent = () => {
               <Modal.Body className="bg-light py-4 px-5">
                 <p className="text-dark mb-2" style={{ fontSize: '16px' }}>
                   Are you sure you want to delete this ticket?<br />
-                  [Bussiness Use] ID ({selectedTicketId})
+                  [Bussiness Use] ID ({selectedTicketId?.get("ticketNo")})
                 </p>
               </Modal.Body>
               <Modal.Footer className="bg-light py-3">
                 <Button variant="secondary" onClick={() => setShowModal(false)}>
                   Cancel
                 </Button>
-                <Button variant="danger" onClick={() => handleDelete(selectedTicketId)}>
+                <Button variant="danger" onClick={() => handleDelete(selectedTicketId?.get("ticketId") ?? "")}>
                   Confirm
                 </Button>
               </Modal.Footer>
