@@ -89,8 +89,8 @@ const TicketsPage = () => {
       console.log('Ticket ticketNumbers' + ticketIds.join(","));
       console.log('Ticket Count' + ticketCount);
 
-      // sendEmail(String(session?.user.email),
-      //   String(session?.user.name), String(formattedDate), String(totalPrice), paymentMethod, ticketType, /* ticket.eventCode */ ticketIds.join(","), String(ticketCount));
+      sendEmail(String(session?.user.email),
+        String(session?.user.name), String(formattedDate), String(totalPrice), paymentMethod, ticketType, /* ticket.eventCode */ ticketIds.join(","), String(ticketCount));
       router.push(`/tickets/detail?purchaseStatus=success`);
     } catch (error) {
       setError('Unexpected error is occured.Please try again');
