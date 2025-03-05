@@ -54,30 +54,30 @@ const PageContent = () => {
     setAutoIncrementedTickets(updatedTickets);
   }, [tickets]);
 
-  const handleButtonClick = (ticketNo: string, ticketId: string) => {
-    let data: Map<string, string> = new Map()
+  const handleButtonClick = (ticketNo: any, ticketId: any) => {
+    let data: Map<string, any> = new Map()
     data.set("ticketNo", ticketNo)
     data.set("ticketId", ticketId)
     setSelectedTicketId(data);
     setShowModal(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (delTicket: any) => {
     // Disable Delete
-    if (id === "") {
+    if (!delTicket || delTicket.get("ticketNo") === "") {
       return;
     }
-    console.log('Delete Id ' + id);
+    console.log('Delete Id ' + delTicket.get("ticketNo"));
     setShowModal(false);
     try {
-      deleteTicketByIds(userId, String(id))
-      setMessage(`The ticket with ID (${id}) is successfully deleted!`);
+      deleteTicketByIds(userId, String(delTicket.get("ticketId")))
+      setMessage(`The ticket with ID (${delTicket.get("ticketNo")}) is successfully deleted!`);
 
       // 削除後、状態を更新
       setAutoIncrementedTickets((prevTickets) => {
         return prevTickets.map(group => ({
           ...group,
-          tickets: group.tickets.filter(ticket => ticket.ticketId !== id)
+          tickets: group.tickets.filter(ticket => ticket.ticketId !== delTicket.get("ticketId"))
         }));
       });
     } catch (error) {
@@ -90,8 +90,7 @@ const PageContent = () => {
     await getTicketsByUserId(userId, (res) => {
       if (res) {
         const ticketsArray = Object.entries(res).map(([key, value]) => {
-          const { autoId, ...other } = (value as any)
-          const ticketNo = autoId < 10 ? `000${autoId}` : autoId < 100 ? `00${autoId}` : autoId < 1000 ? `0${autoId}` : `${autoId}`
+          const { ticketNo, ...other } = (value as any)
           return ({
             userId: userId,
             ticketNo: ticketNo,
@@ -147,15 +146,18 @@ const PageContent = () => {
                       <div className="card shadow-lg rounded-3 ticket-card" style={{ position: 'relative', userSelect: 'none', overflow: 'hidden' }}>
                         <div className="d-flex justify-content-between align-items-center p-2">
                           <span className="beautiful-header text-dark" style={{ fontSize: '20px' }}>
-                            Ticket No : {ticket.ticketNo}
-                            {/* {ticket.ticketType} ({ticket.autoIncrementedId}) 自動ID */}
+                            {/* if paid isn't finished yet, temporary number will show */}
+                            {
+                              ticket.ticketNo ? `Ticket No : ${ticket.ticketNo}` : `Temporary Ticket No : ${ticket.ticketTmpNo}`
+                            }
                           </span>
                           {ticket.isPaid ? (
                             <button className="btn btn-delete" disabled>
                               Delete <i className="bi bi-trash"></i>
                             </button>
                           ) : (
-                            <button className="btn btn-delete" onClick={() => handleButtonClick(ticket.ticketNo, ticket.ticketId)}>
+                            // if paid isn't finished yet, temporary number will show
+                            <button className="btn btn-delete" onClick={() => handleButtonClick(ticket.ticketNo || ticket.ticketTmpNo, ticket.ticketId)}>
                               Delete <i className="bi bi-trash"></i>
                             </button>
                           )}
@@ -222,7 +224,8 @@ const PageContent = () => {
                             <div style={{ textAlign: 'center', marginTop: '20px' }}>
                               <p style={{ fontSize: '14px', fontWeight: 'bold', color: '#333' }}>QR For Scan</p>
                               <QRCodeCanvas value={`${baseUrl}/admin/qrcode_ticket/${ticket.userId}/${ticket.ticketId}`} size={150} />
-                              <p style={{ fontSize: '10px' }}>[Bussiness Use] ID ({ticket.ticketNo})</p>
+                              {/* if paid isn't finished yet, temporary number will show */}
+                              <p style={{ fontSize: '10px' }}>[Bussiness Use] ID ({ticket.ticketNo || ticket.ticketTmpNo})</p>
                             </div>
 
                           </div>
@@ -255,7 +258,7 @@ const PageContent = () => {
                 <Button variant="secondary" onClick={() => setShowModal(false)}>
                   Cancel
                 </Button>
-                <Button variant="danger" onClick={() => handleDelete(selectedTicketId?.get("ticketId") ?? "")}>
+                <Button variant="danger" onClick={() => handleDelete(selectedTicketId)}>
                   Confirm
                 </Button>
               </Modal.Footer>

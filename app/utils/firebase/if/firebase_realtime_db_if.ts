@@ -46,15 +46,12 @@ export const readRealTimeData = (path: string, callback: (data: any) => void) =>
     }
 }
 
-export const addRealTimeData = async (path: string, data: any, times: number = 1) => {
+export const addRealTimeData = async (path: string, data: any) => {
     try {
         const targetPathRef = ref(realtimeDb, path);
-        while (times > 0) {
-            await push(targetPathRef, data)
-            times -= 1
-        }
+        await push(targetPathRef, data)
     } catch (error) {
-        console.log(error)
+        throw error
     }
 }
 

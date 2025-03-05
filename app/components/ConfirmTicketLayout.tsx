@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { getTicketsByUserIdAndTicketId, updateTicketByIds } from "../services/ticket_service"
 import Ticket from "../dao/ticket";
-import { convertDate } from "../utils/date_fromat/date_format";
+import { convertDate } from "../utils/date_utils/date_format";
 import thisLayout from "./ConfirmTicketLayout.module.css";
 import { useAuth } from "../contexts/AuthContext";
 import Header from "./Header";

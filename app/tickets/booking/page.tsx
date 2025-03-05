@@ -8,8 +8,6 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import '../../common/styles/globals.css';
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/navigation';
-import { getUserByEmail } from '@/app/services/user_service';
-import { User } from '@/app/dao/user';
 import { addNewTickets } from "@/app/services/ticket_service";
 import MessageAlert from '@/app/components/MessageAlert';
 import Event from '@/app/dao/event';
@@ -30,25 +28,18 @@ const TicketsPage = () => {
   const [selectedTicket, setSelectedTicket] = useState<Event | null>(null);
 
   // Initialize ticket count state with each ticket having a count of 0
-  const [ticketCounts, setTicketCounts] = useState<{ [key: string]: number }>({}
-    // tickets.reduce((acc, ticket) => {
-    //   // console.log("Before", acc)
-    //   acc[ticket.eventId] = 0;
-    //   // console.log("After", acc)
-    //   return acc;
-    // }, {} as { [ticketId: string]: number })
-  );
+  const [ticketCounts, setTicketCounts] = useState<{ [key: string]: number }>({});
 
-  // Function to update the count for a specific ticket by ticket ID
+  // Function to update the count for a specific ticket by ticket ID, 
+  // the maximum tickets must be 5
   const handleTicketCountChange = (ticketId: string, change: number) => {
-    console.log(ticketId)
-    console.log("=>", ticketCounts[ticketId])
     setTicketCounts((prevCounts) => ({
       ...prevCounts,
-      [ticketId]: Math.max(0, (prevCounts[ticketId] ?? 0) + change),
+      [ticketId]: change > 0 ? Math.min(5, (prevCounts[ticketId] ?? 0) + change) : Math.max(0, (prevCounts[ticketId] ?? 0) + change),
     }));
   };
 
+  // Reset Ticket Count
   const handleReset = (ticketId?: string) => {
     setTicketCounts((prevCounts) => {
       if (ticketId !== undefined) {
@@ -79,12 +70,10 @@ const TicketsPage = () => {
   const [userId, setUserId] = useState('');
   const handleConfirmPurchase = async (ticket: Event, ticketCount: number, ticketType: string, totalPrice: string) => {
     try {
-      // TODO after craete event Table , replace with following code
-      //await addNewTickets(userId, ticket.id, ticketCount); 
-      const ticketIds: [] = await addNewTickets(userId, ticket.eventId, ticketCount);
-      const ticketNumbers = ticketIds.map((data) => (data ?? 0) < 10 ? `000${data}` : data < 100 ? `00${data}` : data < 1000 ? `0${data}` : `${data}`).join(", ")
-      // send email to ticket purchaser
-      // TODO change ticketId value
+      // add tickets to database, and get the ticketIds
+      const ticketIds: number[] = await addNewTickets(userId, ticket.eventId, ticketCount);
+
+      // prepare for mail send
       const currentDate = new Date();
       const formattedDate = currentDate.toLocaleString('ja-JP', {
         timeZone: 'Asia/Tokyo',
@@ -97,11 +86,11 @@ const TicketsPage = () => {
       console.log('Total Price' + totalPrice);
       console.log('Payment Method' + paymentMethod);
       console.log('Ticket Type' + ticketType);
-      console.log('Ticket ticketNumbers' + ticketNumbers);
+      console.log('Ticket ticketNumbers' + ticketIds.join(","));
       console.log('Ticket Count' + ticketCount);
 
-      sendEmail(String(session?.user.email),
-        String(session?.user.name), String(formattedDate), String(totalPrice), paymentMethod, ticketType, /* ticket.eventCode */ ticketNumbers, String(ticketCount));
+      // sendEmail(String(session?.user.email),
+      //   String(session?.user.name), String(formattedDate), String(totalPrice), paymentMethod, ticketType, /* ticket.eventCode */ ticketIds.join(","), String(ticketCount));
       router.push(`/tickets/detail?purchaseStatus=success`);
     } catch (error) {
       setError('Unexpected error is occured.Please try again');
@@ -230,7 +219,6 @@ const TicketsPage = () => {
                         <input
                           type="text"
                           className="form-control text-center"
-                          // value={ticketCounts[ticket.eventId]}
                           value={ticketCounts[ticket.eventId] ?? 0}
                           readOnly
                         />

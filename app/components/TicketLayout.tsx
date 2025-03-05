@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { deleteTicketByIds, getTicketsByUserId, updateTicketByIds } from "../services/ticket_service";
 import Ticket from "../dao/ticket";
-import { convertDate } from "../utils/date_fromat/date_format";
+import { convertDate } from "../utils/date_utils/date_format";
 import { User } from "../dao/user";
 import { useAuth } from "../contexts/AuthContext";
 import Header from "./Header";

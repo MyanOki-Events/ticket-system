@@ -1,29 +1,35 @@
 export default class Ticket {
-    // UserのIdと紐付く
+    // ticket owner_id
     userId: string
 
-    // DocumentIdをticketIdとして使う
+    // ticket unique_id(random)
     ticketId: string
 
-    // Auto Increment Id
-    ticketNo: string
+    // ticket business_id
+    ticketNo: string | null
 
-    // チケットの使い済みか否か判定フラグ
+    // ticket business_id(temporary_id)
+    ticketTmpNo: number
+
+    // ticket usable state
     isUsed: boolean
 
-    // お支払い済みか否か
+    // ticket payment status
     isPaid: boolean
 
-    // 次のイベントなどに必要になる、今回は形として残す
+    // ticket info_id(foreign key of event_id)
     ticketType: string
 
+    // ticket order date
     created: any
 
+    // ticket order finish date | payment finish date
     updated: any
 
-    constructor(userId: string, ticketNo: string = "", ticketId: string = "", created: any = "", updated: any = "", isUsed: boolean = false, isPaid = false, ticketType: string = "") {
+    constructor(userId: string, ticketNo: string | null = null, ticketTmpNo: number = 0, ticketId: string = "", created: any = "", updated: any = "", isUsed: boolean = false, isPaid = false, ticketType: string = "") {
         this.userId = userId
         this.ticketNo = ticketNo
+        this.ticketTmpNo = ticketTmpNo
         this.ticketId = ticketId
         this.isUsed = isUsed
         this.isPaid = isPaid
