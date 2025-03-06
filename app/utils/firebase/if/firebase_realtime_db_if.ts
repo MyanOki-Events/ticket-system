@@ -34,6 +34,19 @@ export const addNewItemWithIcId = async (counterPath: string, dataPath: string, 
     return ticketIds
 }
 
+export const readDataAtOnce = async (path: string) => {
+    try {
+        const targetPathRef = ref(realtimeDb, path);
+        const snapshot = await get(targetPathRef)
+        if (snapshot.exists()) {
+            return snapshot.val()
+        }
+    } catch (error) {
+        console.log(error)
+    }
+    return null
+}
+
 export const readRealTimeData = (path: string, callback: (data: any) => void) => {
     try {
         const targetPathRef = ref(realtimeDb, path);
