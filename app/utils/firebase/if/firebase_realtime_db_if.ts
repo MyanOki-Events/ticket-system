@@ -34,6 +34,14 @@ export const addNewItemWithIcId = async (counterPath: string, dataPath: string, 
     return ticketIds
 }
 
+export const getLastAutoIncrementNumber = async (counterPath: string) => {
+    const counterRef = ref(realtimeDb, counterPath)
+    const counterTransactionResult = await runTransaction(counterRef, (currentId: number | null) => {
+        return (currentId || 0) + 1;
+    });
+    return counterTransactionResult.snapshot.val() as number
+}
+
 export const readDataAtOnce = async (path: string) => {
     try {
         const targetPathRef = ref(realtimeDb, path);

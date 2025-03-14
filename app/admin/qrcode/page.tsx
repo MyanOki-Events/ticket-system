@@ -1,4 +1,6 @@
 "use client";
+import Footer from "@/app/components/Footer";
+import Header from "@/app/components/Header";
 import Ticket from "@/app/dao/ticket";
 import { updateTicketByIds } from "@/app/services/ticket_service";
 import { convertDate } from "@/app/utils/date_utils/date_format";
@@ -116,9 +118,10 @@ export default function QRScanner() {
 
     return (
         <>
+            <Header />
             <div className="container">
                 <div className="d-flex flex-column justify-content-center align-items-center">
-                    <h2 className="mb-3">QR Code Scanner</h2>
+                    <h2 className="mb-3" style={{ paddingTop: '60px', color: '#2a9d8f' }}>QR Code Scanner</h2>
                     <div id="reader" className="col-12 col-sm-11 col-md-8"></div>
                     {
                         scanQRShow && <button className="btn btn-primary" type="button" onClick={() => startScanner()}>Scan QR Code</button>
@@ -151,6 +154,7 @@ export default function QRScanner() {
                     </div>
                 </div>
             </div>
+            <Footer />
         </>
     );
 }

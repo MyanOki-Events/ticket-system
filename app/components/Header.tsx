@@ -20,7 +20,7 @@ const Header = ({ }) => {
       setActiveItem('detail');
     } else if (pathname === '/admin/event' || pathname === '/admin/event/add_new' || pathname.includes('/admin/event/edit_old')) {
       setActiveItem('event');
-    } else if (pathname === '/admin' || pathname.includes('/admin/member')) {
+    } else if (pathname === '/admin' || pathname.includes('/admin/member') || pathname.includes('/admin/ticket') || pathname.includes('/admin/qrcode')) {
       setActiveItem('admin');
     }
   }, [pathname]);

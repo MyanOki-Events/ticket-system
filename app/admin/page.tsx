@@ -41,30 +41,16 @@ const AdminPage = () => {
             <h1 className="text-center text-dark" style={{ paddingTop: '60px' }}>Admin Dashboard</h1>
 
             <section>
-              <h3 className="text-dark">All Users</h3>
-              <div className="overflow-x-scroll">
-                <table className="table table-sm table-bordered border-dark">
-                  <thead>
-                    <tr>
-                      <th>User Name</th>
-                      <th>Email</th>
-                      <th>Detail</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users.map((user) => (
-                      <tr key={user.userId} onClick={async () => await handleClick(user.userId)}>
-                        <td>{user.name}</td>
-                        <td>{user.email}</td>
-                        <td>
-                          <Link href={`admin/member/${user.userId}`}>
-                            <i className="bi bi-clipboard-data"></i>
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="d-flex justify-content-center gap-2">
+                <Link href={`admin/member`} className="btn btn-secondary p-3">
+                  All Members
+                </Link>
+                <Link href={`admin/ticket`} className="btn btn-secondary p-3">
+                  All Tickets
+                </Link>
+                <Link href={`admin/qrcode`} className="btn btn-secondary p-3">
+                  QR-Code Reader
+                </Link>
               </div>
             </section>
           </div>
