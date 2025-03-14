@@ -56,7 +56,7 @@ const AllMembersPage = () => {
                         <td>{user.name}</td>
                         <td>{user.email}</td>
                         <td>
-                          <Link href={`admin/member/${user.userId}`}>
+                          <Link href={`member/${user.userId}`}>
                             <i className="bi bi-clipboard-data"></i>
                           </Link>
                         </td>
