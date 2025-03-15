@@ -18,6 +18,7 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import LoadingLayout from "@/app/components/LoadingLayout";
 import { getAllEvent } from "@/app/services/event_services";
 import Event from "@/app/dao/event";
+import TicketPDFDownload from '@/app/components/TicketPDFDownload';
 
 const PageContent = () => {
   const { data: session } = useSession()
@@ -113,7 +114,7 @@ const PageContent = () => {
   useEffect(() => {
     _getTicketsByUserId()
     if (purchaseStatus) {
-      setMessage('Booking of the ticket(s) are successully completed!.We will send email of booking detail to your email.'); // メッセージをstateにセット
+      setMessage('Booking of the ticket(s) are successully completed!We will send email of booking detail to your email.'); // メッセージをstateにセット
     }
   }, [_getTicketsByUserId])
 
@@ -131,6 +132,7 @@ const PageContent = () => {
             {/* Info or Error Message */}
             <MessageAlert message={message} type="info" />
             <MessageAlert message={error} type="danger" />
+            <TicketPDFDownload baseUrl={baseUrl} />
             <div className="row">
               {autoIncrementedTickets.length === 0 ? (
                 <div className="col-12 mb-4">
@@ -147,9 +149,10 @@ const PageContent = () => {
                         <div className="d-flex justify-content-between align-items-center p-2">
                           <span className="beautiful-header text-dark" style={{ fontSize: '20px' }}>
                             {/* if paid isn't finished yet, temporary number will show */}
-                            {
+                            {/* {
                               ticket.ticketNo ? `Ticket No : ${ticket.ticketNo}` : `Temporary Ticket No : ${ticket.ticketTmpNo}`
-                            }
+                            } */}
+                             {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventTitle} ({ticket.autoIncrementedId})
                           </span>
                           {ticket.isPaid ? (
                             <button className="btn btn-delete" disabled>
@@ -168,7 +171,7 @@ const PageContent = () => {
                             <Image
                               src="/water_festival_ticket_final.png"
                               alt={ticket.ticketType}
-                              className="img-fluid rounded-start"
+                              className="img-fluid rounded"
                               onMouseDown={(e) => e.preventDefault()}
                               onTouchStart={(e) => e.preventDefault()}
                               style={{ maxHeight: '250px', objectFit: 'cover' }}
@@ -187,7 +190,7 @@ const PageContent = () => {
                                 <tbody>
                                   <tr>
                                     <td style={{ fontSize: '0.8rem' }}><strong>Date:</strong> {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventDate}</td>
-                                    <td style={{ fontSize: '0.8rem' }}><strong>Place:</strong> {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.location}</td>
+                                    <td style={{ fontSize: '0.8rem' }}><strong>Place:</strong> {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventPlace}</td>
                                   </tr>
                                   <tr>
                                     <td style={{ fontSize: '0.8rem' }}><strong>Time:</strong> {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventTime}</td>
@@ -225,7 +228,7 @@ const PageContent = () => {
                               <p style={{ fontSize: '14px', fontWeight: 'bold', color: '#333' }}>QR For Scan</p>
                               <QRCodeCanvas value={`${baseUrl}/admin/qrcode_ticket/${ticket.userId}/${ticket.ticketId}`} size={150} />
                               {/* if paid isn't finished yet, temporary number will show */}
-                              <p style={{ fontSize: '10px' }}>[Bussiness Use] ID ({ticket.ticketNo || ticket.ticketTmpNo})</p>
+                              <p style={{ fontSize: '10px' }}>Ticket No: {ticket.ticketNo ? `${ticket.ticketNo}` : `T${ticket.ticketTmpNo}`}</p>
                             </div>
 
                           </div>
@@ -249,9 +252,9 @@ const PageContent = () => {
                 <Modal.Title style={{ fontSize: '18px' }}>Confirm Your Purchase</Modal.Title>
               </Modal.Header>
               <Modal.Body className="bg-light py-4 px-5">
-                <p className="text-dark mb-2" style={{ fontSize: '16px' }}>
+                <p className="text-dark mb-2" style={{ fontSize: '14px' }}>
                   Are you sure you want to delete this ticket?<br />
-                  [Bussiness Use] ID ({selectedTicketId?.get("ticketNo")})
+                  Ticket No: T{selectedTicketId?.get("ticketNo")}
                 </p>
               </Modal.Body>
               <Modal.Footer className="bg-light py-3">
