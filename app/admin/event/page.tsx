@@ -67,6 +67,11 @@ const EventPage = () => {
                                                         </div>
 
                                                         <div className="d-flex align-items-center">
+                                                            <i className="bi bi-house text-success me-3" style={{ fontSize: '24px' }}></i>
+                                                            <span>{event.eventPlace}</span>
+                                                        </div>
+
+                                                        <div className="d-flex align-items-center">
                                                             <i className="bi bi-geo-alt text-success me-3" style={{ fontSize: '24px' }}></i>
                                                             <span>{event.location}</span>
                                                         </div>

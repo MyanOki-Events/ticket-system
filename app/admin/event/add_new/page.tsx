@@ -7,7 +7,7 @@ import Event from "@/app/dao/event";
 import { addNewEvent } from "@/app/services/event_services";
 import { useState } from "react";
 const EventAddFormLayout = () => {
-    const initEvent: Event = new Event("", "", "", "", "", 0, "", "", "")
+    const initEvent: Event = new Event("", "", "", "","","", 0, "", "", "")
     const [eventData, setEventData] = useState(initEvent);
     const [addStatus, setAddStatus] = useState(false);
     const { loading } = useAuth()
@@ -59,6 +59,11 @@ const EventAddFormLayout = () => {
                                 <div className="form-group mb-3">
                                     <label htmlFor="eventTime" className="mb-1">Event Time</label>
                                     <input type="text" name="eventTime" onChange={handleChange} className="form-control" id="eventTime" placeholder="00:00 AM - 00:00 PM" />
+                                </div>
+
+                                <div className="form-group mb-3">
+                                    <label htmlFor="eventPlace" className="mb-1">Event Place</label>
+                                    <input type="text" name="eventPlace" value={eventData.eventPlace} onChange={handleChange} className="form-control" id="eventPlace" placeholder="Enter Place like event hall" />
                                 </div>
 
                                 <div className="form-group mb-3">

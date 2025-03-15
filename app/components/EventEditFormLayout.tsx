@@ -62,6 +62,11 @@ const EventEditFormLayout = ({ eventInfo }: { eventInfo: Event }) => {
                                 </div>
 
                                 <div className="form-group mb-3">
+                                    <label htmlFor="eventPlace" className="mb-1">Event Place</label>
+                                    <input type="text" name="eventPlace" value={eventData.eventPlace} onChange={handleChange} className="form-control" id="eventPlace" placeholder="Enter Place like event hall" />
+                                </div>
+
+                                <div className="form-group mb-3">
                                     <label htmlFor="eventLocation" className="mb-1">Location</label>
                                     <input type="text" name="location" value={eventData.location} onChange={handleChange} className="form-control" id="eventLocation" placeholder="Enter Location" />
                                 </div>
