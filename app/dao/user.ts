@@ -8,7 +8,7 @@ export class User {
     address: string
     role: number
 
-    constructor(userId: string, name: string, displayName: string = "", email: string, created: any, updated: any, address: string = "", role: number = 0) {
+    constructor(userId: string, name: string, email: string, created: any, updated: any, displayName: string = "", address: string = "", role: number = 0) {
         this.userId = userId
         this.name = name
         this.displayName = displayName
