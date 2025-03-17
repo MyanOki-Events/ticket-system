@@ -6,11 +6,17 @@ import { signOut, useSession } from "next-auth/react";
 import '../common/styles/globals.css';
 import { usePathname } from 'next/navigation';
 import { signOutFromFirebase } from "../utils/firebase_auth_async";
+import Link from "next/link";
+import { getUserById } from "../services/user_service";
+import { User } from "../dao/user";
 
 const Header = ({ }) => {
   const [activeItem, setActiveItem] = useState('booking');
   const { data: session } = useSession();
   const pathname = usePathname();
+
+  const [userGoogleName, setUserGoogleName] = useState("");
+  const [userDisplayName, setUserDisplayName] = useState("");
 
   useEffect(() => {
     require("bootstrap/dist/js/bootstrap.bundle.min.js");
@@ -22,8 +28,22 @@ const Header = ({ }) => {
       setActiveItem('event');
     } else if (pathname === '/admin' || pathname.includes('/admin/member') || pathname.includes('/admin/ticket') || pathname.includes('/admin/qrcode')) {
       setActiveItem('admin');
+    } else {
+      // No navigation
+      setActiveItem('')
     }
   }, [pathname]);
+
+  useEffect(() => {
+    if (session?.user.userId) {
+      getUserById(session.user.userId)
+        .then((data) => {
+          setUserGoogleName((data as User).name ?? "")
+          setUserDisplayName((data as User).displayName ?? "")
+        })
+        .catch((error) => console.log(error))
+    }
+  }, [session])
 
 
   const handleItemClick = (section: SetStateAction<string>) => {
@@ -45,7 +65,7 @@ const Header = ({ }) => {
               <>
                 <span className="d-block d-sm-none" style={{ fontSize: '10px', marginTop: '5px' }}>
                   <i className="bi bi-person-circle me-2" style={{ fontSize: '10px' }}></i>
-                  {session.user?.name}
+                  {(userDisplayName && userDisplayName !== "") ? userDisplayName : userGoogleName}
                 </span>
               </>
             }
@@ -79,12 +99,29 @@ const Header = ({ }) => {
                   {/* Show username only on larger screens */}
                   <span className="d-none d-sm-block text-white me-3" style={{ fontSize: '14px' }}>
                     <i className="bi bi-person-circle me-2" style={{ fontSize: '16px' }}></i>
-                    {session.user?.name}
+                    {(userDisplayName && userDisplayName !== "") ? userDisplayName : userGoogleName}
                   </span>
                   {/* Ensure Logout button is always at the end */}
-                  <button className="btn btn-danger" onClick={handleLogout}>
+                  {/* <button className="btn btn-danger" onClick={handleLogout}>
                     Logout
-                  </button>
+                  </button> */}
+                  <div className="btn-group">
+                    {/* <button className="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Large button
+                    </button> */}
+                    <i className="bi bi-gear dropdown-toggle text-white fs-5 btn rounded" data-bs-toggle="dropdown" aria-expanded="false"></i>
+                    <ul className="dropdown-menu">
+                      <li>
+                        {/* <Link className="btn btn-primary w-100" href={``}>Edit Profile</Link> */}
+                        <Link href={`/settings`}>Edit Profile</Link>
+                      </li>
+                      <li className="border-bottom"></li>
+                      <li>
+                        <span onClick={handleLogout}>Logout</span>
+                        {/* <button className="btn btn-danger w-100" onClick={handleLogout}>Logout</button> */}
+                      </li>
+                    </ul>
+                  </div>
                 </>
               )}
             </div>

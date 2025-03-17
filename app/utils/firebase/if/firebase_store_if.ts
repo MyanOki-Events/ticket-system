@@ -2,6 +2,7 @@ import { storeDb } from "../config/firebase_store";
 import {
     addDoc,
     getDoc,
+    setDoc,
     collection,
     getDocs,
     deleteDoc,
@@ -42,6 +43,10 @@ export const deleteDocumentByDocId = async (collectionName: string, docId: strin
 
 export const updateDocumentByDocId = async (collectionName: string, docId: string, updateData: any) => {
     await updateDoc(doc(storeDb, collectionName, docId), updateData);
+};
+
+export const setDocumentByDocId = async (collectionName: string, docId: string, updateData: any) => {
+    await setDoc(doc(storeDb, collectionName, docId), updateData, { merge: true });
 };
 
 function generateWhere(data: FirebaseWhere[]) {

@@ -128,12 +128,12 @@ const getCurrentDateTime = (): string => {
 };
 
 const TicketPDF: React.FC<TicketPDFProps> = ({ tickets, baseUrl, events }) => {
-    const [isClient, setIsClient] = useState(false);
-    const [qrCodeUrls, setQrCodeUrls] = useState<string[]>([]);
+  const [isClient, setIsClient] = useState(false);
+  const [qrCodeUrls, setQrCodeUrls] = useState<string[]>([]);
 
-    useEffect(() => {
-      setIsClient(true); // Ensure we are on the client-side
-    
+  useEffect(() => {
+    setIsClient(true); // Ensure we are on the client-side
+
     const generateQRCodes = async () => {
       try {
         const qrCodes = [];
@@ -152,64 +152,64 @@ const TicketPDF: React.FC<TicketPDFProps> = ({ tickets, baseUrl, events }) => {
     if (tickets.length > 0) {
       generateQRCodes();
     }
-    }, [tickets, baseUrl]);
-  
-    return (
-      <Document>
-        {tickets.map((ticket, index) => (
-          <Page key={ticket.ticketId} style={styles.body} size="A7">
-            {/* Header Section */}
-            <Text style={styles.header} fixed>
-              ~ Ticket with QR Code ~
-            </Text>
+  }, [tickets, baseUrl]);
 
-            {/* Ticket Title */}
-            <Text style={styles.ticketTitle}>ADMISSION TICKET</Text>
+  return (
+    <Document>
+      {tickets.map((ticket, index) => (
+        <Page key={ticket.ticketId} style={styles.body} size="A7">
+          {/* Header Section */}
+          <Text style={styles.header} fixed>
+            ~ Ticket with QR Code ~
+          </Text>
 
-            {/* Event Image */}
-            <Image
-              src="/water_festival_ticket_final.png"
-              style={{ height: 100, width: '100%' }}
-            />
+          {/* Ticket Title */}
+          <Text style={styles.ticketTitle}>ADMISSION TICKET</Text>
 
-            {/* Ticket Info Section */}
-            <View style={styles.ticketInfo}>
-              {/* Event Information */}
-              <View style={styles.eventInfo}>
-                <Text style={styles.eventTitle}>{events.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventTitle}</Text>
-                <Text style={styles.eventDate}>{events.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventDate}</Text>
-                <Text style={styles.eventTime}>{events.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventTime}</Text>
-                <Text style={styles.eventPlace}>{events.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventPlace}</Text>
-                <Text style={styles.eventAddress}>{events.filter((evt) => evt.eventId == ticket.ticketType).pop()?.location}</Text>
-              </View>
+          {/* Event Image */}
+          <Image
+            src="/water_festival_ticket_final.png"
+            style={{ height: 100, width: '100%' }}
+          />
 
-              {/* QR Code */}
-              <View style={styles.imageContainer}>
-                {/* Render the QR code for the current ticket */}
-                <Image
-                  src={qrCodeUrls[index] || ''}
-                  style={styles.qrCodeImage}
-                />
-              </View>
+          {/* Ticket Info Section */}
+          <View style={styles.ticketInfo}>
+            {/* Event Information */}
+            <View style={styles.eventInfo}>
+              <Text style={styles.eventTitle}>{events.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventTitle}</Text>
+              <Text style={styles.eventDate}>{events.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventDate}</Text>
+              <Text style={styles.eventTime}>{events.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventTime}</Text>
+              <Text style={styles.eventPlace}>{events.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventPlace}</Text>
+              <Text style={styles.eventAddress}>{events.filter((evt) => evt.eventId == ticket.ticketType).pop()?.location}</Text>
             </View>
 
-            {/* Business Info Section */}
-            <View style={styles.businessInfo}>
-              <Text style={styles.ticketNo}>Ticket Number: {ticket.ticketNo}</Text>
-              <Text style={styles.createDT}>Created at: {getCurrentDateTime()}</Text>
+            {/* QR Code */}
+            <View style={styles.imageContainer}>
+              {/* Render the QR code for the current ticket */}
+              <Image
+                src={qrCodeUrls[index] || ''}
+                style={styles.qrCodeImage}
+              />
             </View>
+          </View>
 
-            {/* Page Number */}
-            <Text
-              style={styles.pageNumber}
-              render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}
-              fixed
-            />
-          </Page>
-        ))}
+          {/* Business Info Section */}
+          <View style={styles.businessInfo}>
+            <Text style={styles.ticketNo}>Ticket Number: {String(ticket.ticketNo).padStart(4, "0")}</Text>
+            <Text style={styles.createDT}>Created at: {getCurrentDateTime()}</Text>
+          </View>
+
+          {/* Page Number */}
+          <Text
+            style={styles.pageNumber}
+            render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}
+            fixed
+          />
+        </Page>
+      ))}
     </Document>
 
-    );
-  };
+  );
+};
 
 export default TicketPDF;
