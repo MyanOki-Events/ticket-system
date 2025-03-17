@@ -152,7 +152,7 @@ const PageContent = () => {
                             {/* {
                               ticket.ticketNo ? `Ticket No : ${ticket.ticketNo}` : `Temporary Ticket No : ${ticket.ticketTmpNo}`
                             } */}
-                             {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventTitle} ({ticket.autoIncrementedId})
+                            {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventTitle} ({ticket.autoIncrementedId})
                           </span>
                           {ticket.isPaid ? (
                             <button className="btn btn-delete" disabled>
@@ -228,7 +228,8 @@ const PageContent = () => {
                               <p style={{ fontSize: '14px', fontWeight: 'bold', color: '#333' }}>QR For Scan</p>
                               <QRCodeCanvas value={`${baseUrl}/admin/qrcode_ticket/${ticket.userId}/${ticket.ticketId}`} size={150} />
                               {/* if paid isn't finished yet, temporary number will show */}
-                              <p style={{ fontSize: '10px' }}>Ticket No: {ticket.ticketNo ? `${ticket.ticketNo}` : `T${ticket.ticketTmpNo}`}</p>
+                              <p style={{ fontSize: '10px' }}>Ticket No: {String(ticket.ticketNo || `T${ticket.ticketTmpNo}`).padStart(4, "0")}</p>
+                              {/* <p style={{ fontSize: '10px' }}>Ticket No: {ticket.ticketNo ? `${ticket.ticketNo}` : `T${ticket.ticketTmpNo}`}</p> */}
                             </div>
 
                           </div>

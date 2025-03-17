@@ -1,7 +1,7 @@
 import { User } from "../dao/user";
 import { FirebaseWhere } from "../utils/firebase/firebase_where";
 import { WhereOpt } from "../utils/firebase/firebase_where_opt";
-import { getDocumentById, getDocumentByWhereClause, getMultipleDocuments, addNewDocument } from "../utils/firebase/if/firebase_store_if";
+import { getDocumentById, getDocumentByWhereClause, getMultipleDocuments, addNewDocument, setDocumentByDocId } from "../utils/firebase/if/firebase_store_if";
 
 export const getAllUsers = async () => {
     let users: User[] = []
@@ -53,4 +53,12 @@ export const addNewUser = async (user: User) => {
         console.log(error)
     }
     return ""
+}
+
+export const updateUser = async (userId: string, data: any) => {
+    try {
+        await setDocumentByDocId("users", userId, data)
+    } catch (error) {
+        console.log(error)
+    }
 }
