@@ -80,6 +80,12 @@ const updateTicketPayment = async (userId: string, ticketType: string, ticketId:
     await updateRealTimeData(path, other)
 }
 
+/** get count of paid tickets on different ticket type */
+const getCountOfPaidTickets = async (ticketType: string, callback: (data: any) => void) => {
+    const counterPath: string = `metadata/${ticketType}/ticketLastId`
+    readRealTimeData(counterPath, callback)
+}
+
 export {
     addNewTickets,
     getTicketsByUserId,
@@ -88,5 +94,6 @@ export {
     getTicketsByUserIdAndTicketId,
     getTicketsByUserIdAndTicketIdOnce,
     getAllTickets,
-    updateTicketPayment
+    updateTicketPayment,
+    getCountOfPaidTickets
 }

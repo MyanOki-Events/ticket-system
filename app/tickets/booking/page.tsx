@@ -8,7 +8,7 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import '../../common/styles/globals.css';
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/navigation';
-import { addNewTickets } from "@/app/services/ticket_service";
+import { addNewTickets, getCountOfPaidTickets} from "@/app/services/ticket_service";
 import MessageAlert from '@/app/components/MessageAlert';
 import Event from '@/app/dao/event';
 import { getAllEvent } from '@/app/services/event_services';
@@ -29,6 +29,8 @@ const TicketsPage = () => {
 
   // Initialize ticket count state with each ticket having a count of 0
   const [ticketCounts, setTicketCounts] = useState<{ [key: string]: number }>({});
+
+  const [paidTickets, setPaidTickets] = useState<{ [key: string]: number }>({}); 
 
   // Function to update the count for a specific ticket by ticket ID, 
   // the maximum tickets must be 5
@@ -163,7 +165,21 @@ const TicketsPage = () => {
         }
       })
       .catch((error) => console.log(error))
-  }, [session, getAllEvent, ticketCounts])
+
+      // Iterate through each event ticket and get the ticket count
+      eventTickets.forEach(async (ticket) => {
+        await getCountOfPaidTickets(ticket.eventId, (count) => {
+          // Update the state for the specific ticket's eventId
+          setPaidTickets((prevPaidTickets) => ({
+            ...prevPaidTickets, // Keep the previous counts intact
+            [ticket.eventId]: count, // Update the count for the current ticket
+          }));
+
+          console.log('Count of tickets for eventId ' + ticket.eventId + ': ' + count);
+        });
+      });
+  
+  }, [session, getAllEvent])
 
   return (
     <>
@@ -178,13 +194,18 @@ const TicketsPage = () => {
             <MessageAlert message={message} type="info" />
             <MessageAlert message={error} type="danger" />
             <div className="row mt-4">
-              <div className="col-md-6 offset-md-3">
+            <div className="col-md-6 offset-md-3">
                 {eventTickets.map((ticket, index) => (
                   <div key={index} className="card shadow mb-4">
                     <div className="card-body text-center">
-                      <h6 className="card-title">{ticket.eventTitle} Admission Ticket</h6>
+                      <h6 className="card-title d-flex justify-content-between align-items-center">
+                        <span>{ticket.eventTitle} Admission Ticket</span>
+                        <span className="badge bg-success tickets-sold-badge">
+                          Tickets Sold: {paidTickets[ticket.eventId] || 0}
+                        </span>
+                      </h6>
                       <div className="mt-4 mb-4">
-                        <div className="d-flex flex-column align-items-center">
+                        <div className="d-flex flex-column">
                           <div className="d-flex align-items-center mb-3">
                             <i className="bi bi-calendar-event text-primary me-3" style={{ fontSize: '24px' }}></i>
                             <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
@@ -197,17 +218,23 @@ const TicketsPage = () => {
                               {ticket.eventTime}
                             </p>
                           </div>
-                          <div className="d-flex align-items-center" style={{ lineHeight: '1' }}>
+                          <div className="d-flex align-items-center mb-3" style={{ lineHeight: '1' }}>
+                            <i className="bi bi-house text-warning me-3" style={{ fontSize: '24px' }}></i>
+                            <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
+                              {ticket.eventPlace}
+                            </p>
+                          </div>
+                          <div className="d-flex align-items-center mb-3" style={{ lineHeight: '1' }}>
                             <i className="bi bi-geo-alt text-success me-3" style={{ fontSize: '24px' }}></i>
                             <p className="text-muted mb-0" style={{ fontSize: '14px' }}>
                               {ticket.location}
                             </p>
                           </div>
+                          <p className="card-text" style={{ fontSize: '20px' }}>
+                            <strong>Price per ticket: &#165;{ticket.price}</strong>
+                          </p>
                         </div>
                       </div>
-                      <p className="card-text" style={{ fontSize: '12px' }}>
-                        <strong>Price per ticket: &#165;{ticket.price}</strong>
-                      </p>
                       <div className="input-group">
                         <button
                           className="btn btn-outline-secondary"
@@ -233,7 +260,11 @@ const TicketsPage = () => {
                       <button className="btn btn-outline-danger mt-3 me-2" onClick={() => handleReset(ticket.eventId)}>
                         Reset
                       </button>
-                      <button className="btn btn-primary mt-3" onClick={() => handlePurchase(ticket)} disabled={(ticketCounts[ticket.eventId] && ticketCounts[ticket.eventId] > 0) ? false : true}>
+                      <button
+                        className="btn btn-primary mt-3"
+                        onClick={() => handlePurchase(ticket)}
+                        disabled={ticketCounts[ticket.eventId] && ticketCounts[ticket.eventId] > 0 ? false : true}
+                      >
                         Reserve
                       </button>
                     </div>

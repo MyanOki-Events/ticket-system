@@ -70,6 +70,17 @@ body {
     font-size: 0.8rem;
   }
 
+  /* Fancy Design for Tickets Sold Badge */
+  .tickets-sold-badge {
+    font-size: 14px;
+    padding: 8px 15px;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #34b8ff, #5c6bc0);
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
   /* Adjust styling for mobile devices */
   @media (max-width: 768px) {
     .styled-hr {
@@ -77,3 +88,4 @@ body {
       margin: 10px 0; /* Add a little spacing for mobile devices */
     }
   }
+  
