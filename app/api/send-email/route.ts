@@ -16,25 +16,23 @@ export async function POST(req: Request) {
     // Set up email data
     const emailContent = {
       "bookingConfirmation": {
-        "subject": "Booking Confirmation for Your [Ticket Type] Ticket",
+        "subject": "Booking Confirmation for Your [Ticket Type] Ticket(s)",
         "body": {
           "greeting": "Dear [Customer's Name],",
-          "intro": "We are pleased to confirm that your purchase for the [Ticket Type] ticket has been successfully received.",
+          "intro": "We are pleased to confirm that your purchase of the ticket(s) has been successfully received.",
           "paymentSummary": {
             "event": "Name of Event: [Ticket Type]",
             "bookingDate": "Date of Booking: [Booking Date]",
-            "amountPaid": "Amount to Pay: ¥[Amount Paid]",
+            "ticketType": "Ticket Type: [Ticket Type] Admission Ticket",
+            "ticketCount": "Number of Tickets: [Ticket Count]",
+            "amountPaid": "Total Amount: ¥[Amount Paid]",
+            "ticketIds": "Ticket Ids: [Ticket Ids]",
             "paymentMethod": "Payment Method: [Payment Method]"
           },
-          "ticketDetails": {
-            "ticketType": "Ticket Type: [Ticket Type]",
-            "ticketIds": "Ticket Ids: [Ticket Ids]",
-            "ticketCount": "Number of Tickets : [Ticket Count]"
-          },
-          "confirmation": "Your ticket is now confirmed! Thank you for your bookings. We would like to request you to complete payment until the event date or as soon as possible.",
-          "questions": "If you have any questions or need assistance, feel free to reach out to us.",
+          "confirmation": "Your ticket(s) are now confirmed! Thank you for your bookings. We would like to request you to complete payment within three days including booking day.\nOtherwise your booking ticket(s) will be cancelled automatically.",
+          "questions": "If you have any questions or need assistance, feel free to reach out to us from (在沖縄ミャンマー人会) Facebook Page Messenger.",
           "closing": "We look forward to seeing you at the festival and sharing this exciting experience with you! 🌟",
-          "signature": "Best regards,\nOkianmar Myanmar Association,Okinawa,Japan"
+          "signature": "Best regards,\nOkinawa Myanmar Association,Naha City, Okinawa Dist,Japan"
         }
       }
     }
@@ -46,12 +44,12 @@ export async function POST(req: Request) {
     emailText += emailBody.intro.replace('[Ticket Type]', ticketType) + '\n\n';
     emailText += `${emailBody.paymentSummary.event.replace('[Ticket Type]', ticketType)}\n`;
     emailText += `${emailBody.paymentSummary.bookingDate.replace('[Booking Date]', bookingDate)}\n`;
+    emailText += `${emailBody.paymentSummary.ticketType.replace('[Ticket Type]', ticketType)}\n`;
+    emailText += `${emailBody.paymentSummary.ticketCount.replace('[Ticket Count]', ticketCount)}\n`;
     emailText += `${emailBody.paymentSummary.amountPaid.replace('[Amount Paid]', amountPaid)}\n`;
+    emailText += `${emailBody.paymentSummary.ticketIds.replace('[Ticket Ids]', ticketIds)}\n`;
     emailText += `${emailBody.paymentSummary.paymentMethod.replace('[Payment Method]', paymentMethod)}\n\n`;
-    emailText += `${emailBody.ticketDetails.ticketType.replace('[Ticket Type]', ticketType)}\n`;
-    emailText += `${emailBody.ticketDetails.ticketIds.replace('[Ticket Ids]', ticketIds)}\n`;
-    emailText += `${emailBody.ticketDetails.ticketCount.replace('[Ticket Count]', ticketCount)}\n\n`;
-    emailText += emailBody.confirmation + '\n\n';
+    emailText += emailBody.confirmation + '\n';
     emailText += emailBody.questions + '\n\n';
     emailText += emailBody.closing + '\n\n';
     emailText += emailBody.signature;

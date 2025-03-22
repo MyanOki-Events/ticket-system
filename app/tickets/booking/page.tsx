@@ -14,6 +14,8 @@ import Event from '@/app/dao/event';
 import { getAllEvent } from '@/app/services/event_services';
 import { useAuth } from '@/app/contexts/AuthContext';
 import LoadingLayout from '@/app/components/LoadingLayout';
+import { getUserById } from "@/app/services/user_service";
+import { User } from "@/app/dao/user";
 
 const TicketsPage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -32,6 +34,22 @@ const TicketsPage = () => {
 
   const [paidTickets, setPaidTickets] = useState<{ [key: string]: number }>({}); 
 
+  // get email send flg
+  const isSendEmail = process.env.NEXT_PUBLIC_GMAIL_SEND_FLG!;
+  const [userGoogleName, setUserGoogleName] = useState("");
+  const [userDisplayName, setUserDisplayName] = useState("");
+
+  useEffect(() => {
+    if (session?.user.userId) {
+      getUserById(session.user.userId)
+        .then((data) => {
+          setUserGoogleName((data as User).name ?? "")
+          setUserDisplayName((data as User).displayName ?? "")
+        })
+        .catch((error) => console.log(error))
+    }
+  }, [session])
+  
   // Function to update the count for a specific ticket by ticket ID, 
   // the maximum tickets must be 5
   const handleTicketCountChange = (ticketId: string, change: number) => {
@@ -82,6 +100,9 @@ const TicketsPage = () => {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit', 
         hour12: false, // 24-hour format
       });
       console.log('Current Date' + formattedDate);
@@ -91,8 +112,12 @@ const TicketsPage = () => {
       console.log('Ticket ticketNumbers' + ticketIds.join(","));
       console.log('Ticket Count' + ticketCount);
 
-      sendEmail(String(session?.user.email),
-        String(session?.user.name), String(formattedDate), String(totalPrice), paymentMethod, ticketType, /* ticket.eventCode */ ticketIds.join(","), String(ticketCount));
+      console.log('Send Email Flag' + isSendEmail);
+      const userName = (userDisplayName && userDisplayName !== "") ? userDisplayName : userGoogleName;
+      if(isSendEmail === 'true') {
+          sendEmail(String(session?.user.email),
+          String(userName), String(formattedDate), String(totalPrice), paymentMethod, ticketType, /* ticket.eventCode */ 'T' + ticketIds.join(","), String(ticketCount));
+      }
       router.push(`/tickets/detail?purchaseStatus=success`);
     } catch (error) {
       setError('Unexpected error is occured.Please try again');
@@ -153,7 +178,12 @@ const TicketsPage = () => {
     getAllEvent()
       .then((res) => {
         setEventTickets(res)
+      })
+      .catch((error) => console.log(error))  
+  }, [session, getAllEvent])
 
+  useEffect(() => {
+    if(eventTickets) {
         // set init value for event ticket
         const count = Object.keys(ticketCounts)
         if (count && count.length === 0) {
@@ -163,23 +193,21 @@ const TicketsPage = () => {
           })
           setTicketCounts(data)
         }
-      })
-      .catch((error) => console.log(error))
 
-      // Iterate through each event ticket and get the ticket count
-      eventTickets.forEach(async (ticket) => {
-        await getCountOfPaidTickets(ticket.eventId, (count) => {
-          // Update the state for the specific ticket's eventId
-          setPaidTickets((prevPaidTickets) => ({
-            ...prevPaidTickets, // Keep the previous counts intact
-            [ticket.eventId]: count, // Update the count for the current ticket
-          }));
+        // Iterate through each event ticket and get the ticket count
+        eventTickets.forEach(async (ticket) => {
+          await getCountOfPaidTickets(ticket.eventId, (count) => {
+            // Update the state for the specific ticket's eventId
+            setPaidTickets((prevPaidTickets) => ({
+              ...prevPaidTickets, // Keep the previous counts intact
+              [ticket.eventId]: count, // Update the count for the current ticket
+            }));
 
-          console.log('Count of tickets for eventId ' + ticket.eventId + ': ' + count);
+            console.log('Count of tickets for eventId ' + ticket.eventId + ': ' + count);
+          });
         });
-      });
-  
-  }, [session, getAllEvent])
+    }
+  }, [eventTickets])
 
   return (
     <>
