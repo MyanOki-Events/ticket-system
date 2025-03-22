@@ -12,6 +12,7 @@ import LoadingLayout from "@/app/components/LoadingLayout";
 import { getAllTickets, updateTicketPayment } from "@/app/services/ticket_service";
 import Ticket from "@/app/dao/ticket";
 import { convertDate } from "@/app/utils/date_utils/date_format";
+import Link from "next/link";
 
 class CustomTicket extends Ticket {
     userName: string = ""
@@ -204,10 +205,20 @@ const AllTicketsPage = () => {
 
             {
                 loading ?
-                    <LoadingLayout /> :
+                    <LoadingLayout /> :           
                     <div className="container" style={{ padding: '20px' }}>
                         <h1 className="text-center text-dark" style={{ paddingTop: '60px' }}>All Tickets</h1>
-
+                        {/* Breadcrumb Navigation */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item">
+                                    <Link href="/admin">Admin Dashboard</Link>
+                                </li>
+                                <li className="breadcrumb-item active" aria-current="page">
+                                    All Tickets
+                                </li>
+                            </ol>
+                        </nav>
                         <section>
                             {/* <h3 className="text-dark">All Users</h3> */}
                             <div className="mb-3 d-flex gap-2">
@@ -240,7 +251,7 @@ const AllTicketsPage = () => {
                                             <tr key={ticket.ticketId}>
                                                 <td>{ticket.userName}</td>
                                                 <td>{ticket.userEmail}</td>
-                                                <td>{ticket.ticketNo ? String(ticket.ticketNo).padStart(4, "0") : ticket.ticketTmpNo}</td>
+                                                <td>{ticket.ticketNo ? String(ticket.ticketNo).padStart(4, "0") : 'T'+ticket.ticketTmpNo}</td>
                                                 <td>{ticket.isPaid ? "OK" : "NG"}</td>
                                                 <td>{ticket.isUsed ? "OK" : "NG"}</td>
                                                 <td>{convertDate(ticket.created)}</td>

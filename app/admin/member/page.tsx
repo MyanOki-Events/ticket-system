@@ -38,7 +38,17 @@ const AllMembersPage = () => {
           <LoadingLayout /> :
           <div className="container" style={{ padding: '20px' }}>
             <h1 className="text-center text-dark" style={{ paddingTop: '60px' }}>All Members</h1>
-
+                {/* Breadcrumb Navigation */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb">
+                        <li className="breadcrumb-item">
+                            <Link href="/admin">Admin Dashboard</Link>
+                        </li>
+                        <li className="breadcrumb-item active" aria-current="page">
+                        All Members
+                        </li>
+                    </ol>
+                </nav>
             <section>
               {/* <h3 className="text-dark">All Users</h3> */}
               <div className="overflow-x-scroll">

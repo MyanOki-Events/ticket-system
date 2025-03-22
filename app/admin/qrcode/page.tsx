@@ -6,6 +6,7 @@ import { updateTicketByIds } from "@/app/services/ticket_service";
 import { convertDate } from "@/app/utils/date_utils/date_format";
 import { Html5QrcodeScanner, Html5QrcodeScanType } from "html5-qrcode";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 export default function QRScanner() {
     const [scannedData, setScannedData] = useState("");
@@ -119,7 +120,7 @@ export default function QRScanner() {
     return (
         <>
             <Header />
-            <div className="container">
+            <div className="container" style={{ padding: '20px' }}>
                 <div className="d-flex flex-column justify-content-center align-items-center">
                     <h2 className="mb-3" style={{ paddingTop: '60px', color: '#2a9d8f' }}>QR Code Scanner</h2>
                     <div id="reader" className="col-12 col-sm-11 col-md-8"></div>
