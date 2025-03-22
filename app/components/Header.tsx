@@ -61,7 +61,7 @@ const Header = ({ }) => {
     <div>
       <nav className="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
         <div className="container">
-          <a className="navbar-brand" href="#">
+          <a className="navbar-brand">
             Tickets Booking System
             {session &&
               <>

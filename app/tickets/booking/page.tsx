@@ -16,6 +16,7 @@ import { useAuth } from '@/app/contexts/AuthContext';
 import LoadingLayout from '@/app/components/LoadingLayout';
 import { getUserById } from "@/app/services/user_service";
 import { User } from "@/app/dao/user";
+import PageTopAction from '@/app/components/PageTopAction';
 
 const TicketsPage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -353,6 +354,8 @@ const TicketsPage = () => {
           </div>
       }
 
+      {/* Scroll to Top Button */}
+      <PageTopAction/>
       <Footer />
     </>
   );

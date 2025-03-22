@@ -19,6 +19,7 @@ import LoadingLayout from "@/app/components/LoadingLayout";
 import { getAllEvent } from "@/app/services/event_services";
 import Event from "@/app/dao/event";
 import TicketPDFDownload from '@/app/components/TicketPDFDownload';
+import PageTopAction from '@/app/components/PageTopAction';
 
 const PageContent = () => {
   const { data: session } = useSession()
@@ -274,6 +275,8 @@ const PageContent = () => {
           </div>
       }
 
+      {/* Scroll to Top Button */}
+      <PageTopAction/>
       <Footer />
     </>
   );
