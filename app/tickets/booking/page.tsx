@@ -153,7 +153,8 @@ const TicketsPage = () => {
           paymentMethod: paymentMethod,
           ticketType: ticketType,
           ticketIds: ticketIds,
-          ticketCount: ticketCount
+          ticketCount: ticketCount,
+          emailType: "booking"
         }),
       });
 

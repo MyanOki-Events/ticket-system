@@ -73,6 +73,8 @@ const updateTicketPayment = async (userId: string, ticketType: string, ticketId:
     const updated = serverTimestamp()
     const other = { "updated": updated, "ticketNo": lastTicketNumber, "isPaid": true }
     await updateRealTimeData(path, other)
+
+    return lastTicketNumber
 }
 
 /** get count of paid tickets on different ticket type */

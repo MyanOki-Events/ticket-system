@@ -13,6 +13,9 @@ import { getAllTickets, updateTicketPayment } from "@/app/services/ticket_servic
 import Ticket from "@/app/dao/ticket";
 import { convertDate } from "@/app/utils/date_utils/date_format";
 import Link from "next/link";
+import { Modal, Button } from 'react-bootstrap';
+import Event from '@/app/dao/event';
+import { getAllEvent } from '@/app/services/event_services';
 
 class CustomTicket extends Ticket {
     userName: string = ""
@@ -44,6 +47,12 @@ const AllTicketsPage = () => {
 
     const [ticketDataUpdateSync, setTicketDataUpdateSync] = useState<boolean>(false)
     const [preventDbClick, setPreventDbClick] = useState(false)
+    const [showModal, setShowModal] = useState(false);
+    const [selectedTicketInfo, setSelectedTicketInfo] = useState<Map<string, string>>();
+    const [eventTickets, setEventTickets] = useState<Event[]>([]);
+
+    // get email send flg
+    const isSendEmail = process.env.NEXT_PUBLIC_GMAIL_SEND_FLG!;
 
     useEffect(() => {
         getAllUsers()
@@ -68,7 +77,7 @@ const AllTicketsPage = () => {
                                 for (let j = 0; j < _ticketKeys.length; j++) {
                                     const tId = _ticketKeys[j]
                                     const user = users.filter((user) => user.userId == uId)
-                                    const uName = user && user[0] ? user[0].name : ""
+                                    const uName = user && user[0] ? (user[0].displayName || user[0].name) : ''
                                     const uEmail = user && user[0] ? user[0].email : ""
                                     const tObj = new CustomTicket(uId)
                                     tObj.ticketId = tId
@@ -174,16 +183,109 @@ const AllTicketsPage = () => {
         setLastPage(1)
     }, [filterTickets])
 
-    const payAction = async (userId: string, ticketType: string, ticketId: string) => {
+    const handleButtonClick = (
+        userId: string, 
+        userName: string, 
+        userEmail: string,
+        ticketType: string,
+        ticketId: string,
+        ticketTmpNo: number
+    ) => {
+        let data: Map<string, any> = new Map()
+        data.set("userId", userId)
+        data.set("userName", userName)
+        data.set("userEmail", userEmail)
+        data.set("ticketType", ticketType)
+        data.set("ticketId", ticketId)
+        data.set("ticketTmpNo", ticketTmpNo)
+        setSelectedTicketInfo(data);
+        setShowModal(true);
+      };
+
+    const payAction = async (
+        userId: string,
+        userName: string,
+        userEmail: string,
+        ticketType: string,
+        ticketId: string,
+        ticketTmpNo: string
+    ) => {
         console.log("payAction")
         if (preventDbClick) {
             return;
         }
         console.log("Pass")
         setPreventDbClick(true)
-        await updateTicketPayment(userId, ticketType, ticketId)
+        setShowModal(true);
+        const finalTicketId = await updateTicketPayment(userId, ticketType, ticketId)
+        setShowModal(false);
+        
+        // Extract ticketTitle from the filtered events
+        const eventType = eventTickets.filter((evt) => evt.eventId == ticketType).pop()?.eventTitle;
+
+        if(isSendEmail === 'true') {
+            sendEmail(String(userEmail),
+            String(userName), String(eventType), String(finalTicketId).padStart(4, "0"), 'T' + ticketTmpNo);
+        }
         setPreventDbClick(false)
     }
+
+    useEffect(() => {
+        getAllEvent()
+            .then((res) => {
+            setEventTickets(res)
+            })
+            .catch((error) => console.log(error))  
+    }, [getAllEvent])
+
+    async function sendEmail(
+        email: string, 
+        customerName: string,
+        ticketType: string,
+        ticketNo: string,
+        ticketTmpNo: string
+      ) {
+        console.log('Send Email Method')
+        const currentDate = new Date();
+        const formattedDate = currentDate.toLocaleString('ja-JP', {
+            timeZone: 'Asia/Tokyo',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit', 
+            hour12: false, // 24-hour format
+        });
+        try {
+          const res = await fetch('/api/send-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              to: email,
+              customerName: customerName,
+              bookingDate: formattedDate,
+              ticketType: ticketType,
+              ticketIds: `${ticketTmpNo}(Temp) >>> ${ticketNo}(Final)`,
+              emailType: "purchase"
+            }),
+          });
+    
+          // Check if the response is OK before trying to parse it
+          if (res.ok) {
+            const data = await res.json();  // Attempt to parse JSON only if response is OK
+            console.log('Email sent successfully:', data);
+          } else {
+            // Handle non-OK responses (e.g., 400 or 500)
+            console.error('Error sending email: ', res.statusText);
+          }
+        } catch (error) {
+          // Log any errors that occur during the fetch or JSON parsing
+          console.error('Error in sending email request:', error);
+        }
+      }
 
     const backPage = () => {
         setCurrentPage((cur) => cur = cur - 1)
@@ -257,7 +359,8 @@ const AllTicketsPage = () => {
                                                 <td>{convertDate(ticket.created)}</td>
                                                 <td>{convertDate(ticket.updated)}</td>
                                                 <td>
-                                                    <button onClick={() => payAction(ticket.userId, ticket.ticketType, ticket.ticketId)} className="btn btn-success" disabled={ticket.isPaid}>Pay</button>
+                                                    <button onClick={() => handleButtonClick(ticket.userId, ticket.userName, ticket.userEmail, ticket.ticketType, ticket.ticketId,
+                                                        ticket.ticketTmpNo)} className="btn btn-success" disabled={ticket.isPaid}>Pay</button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -274,6 +377,33 @@ const AllTicketsPage = () => {
                     </div>
             }
 
+            {/* Modal for Delete Confirmation */}
+            <Modal
+              show={showModal}
+              onHide={() => setShowModal(false)}
+              centered
+              size="lg"
+              backdrop="static"
+            >
+              <Modal.Header closeButton className="bg-primary text-white">
+                <Modal.Title style={{ fontSize: '18px' }}>Confirmation of Purchase</Modal.Title>
+              </Modal.Header>
+              <Modal.Body className="bg-light py-4 px-5">
+                <p className="text-dark mb-2" style={{ fontSize: '14px' }}>
+                  Are you sure you want to paid this ticket?<br />
+                  Ticket No: T{selectedTicketInfo?.get("ticketTmpNo")}
+                </p>
+              </Modal.Body>
+              <Modal.Footer className="bg-light py-3">
+                <Button variant="secondary" onClick={() => setShowModal(false)}>
+                  Cancel
+                </Button>
+                <Button variant="danger" onClick={() => payAction(selectedTicketInfo?.get("userId") as string, selectedTicketInfo?.get("userName") as string, selectedTicketInfo?.get("userEmail") as string, 
+                    selectedTicketInfo?.get("ticketType") as string, selectedTicketInfo?.get("ticketId") as string, selectedTicketInfo?.get("ticketTmpNo") as string)}>
+                  Confirm
+                </Button>
+              </Modal.Footer>
+            </Modal>
             <Footer />
         </>
     );

@@ -267,7 +267,7 @@ const PageContent = () => {
               backdrop="static"
             >
               <Modal.Header closeButton className="bg-primary text-white">
-                <Modal.Title style={{ fontSize: '18px' }}>Confirm Your Purchase</Modal.Title>
+                <Modal.Title style={{ fontSize: '18px' }}>Confirmation of Deleting Reserved Ticket</Modal.Title>
               </Modal.Header>
               <Modal.Body className="bg-light py-4 px-5">
                 <p className="text-dark mb-2" style={{ fontSize: '14px' }}>
