@@ -73,7 +73,7 @@ const PageContent = () => {
     setShowModal(false);
     try {
       deleteTicketByIds(userId, String(delTicket.get("ticketId")))
-      setMessage(`The ticket with ID (T${delTicket.get("ticketNo")}) is successfully deleted!`);
+      setMessage(`Ticket No: T${delTicket.get("ticketNo")} is successfully deleted!`);
 
       // 削除後、状態を更新
       setAutoIncrementedTickets((prevTickets) => {
