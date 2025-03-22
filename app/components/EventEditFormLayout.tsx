@@ -82,7 +82,7 @@ const EventEditFormLayout = ({ eventInfo }: { eventInfo: Event }) => {
                                 </div>
 
                                 <div className="form-group mb-3 d-flex gap-1">
-                                    <button onClick={() => exitCurrentPage()} type="button" className="btn btn-danger form-control">Exist</button>
+                                    <button onClick={() => exitCurrentPage()} type="button" className="btn btn-danger form-control">Exit</button>
                                     <button type="submit" className="btn btn-primary form-control">Submit</button>
                                 </div>
                             </form>
