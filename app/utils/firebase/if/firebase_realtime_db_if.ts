@@ -70,7 +70,8 @@ export const readRealTimeData = (path: string, callback: (data: any) => void) =>
 export const addRealTimeData = async (path: string, data: any) => {
     try {
         const targetPathRef = ref(realtimeDb, path);
-        await push(targetPathRef, data)
+        const res = await push(targetPathRef, data)
+        return res.key
     } catch (error) {
         throw error
     }

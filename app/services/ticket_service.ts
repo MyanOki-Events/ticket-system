@@ -1,4 +1,4 @@
-import { serverTimestamp } from "firebase/database"
+import { increment, serverTimestamp } from "firebase/database"
 import Ticket from "../dao/ticket"
 import { addRealTimeData, readRealTimeData, deleteRealTimeData, updateRealTimeData, addNewItemWithIcId, readDataAtOnce, getLastAutoIncrementNumber } from "../utils/firebase/if/firebase_realtime_db_if"
 import { generateUniqueNumber } from "../utils/mono_utils/common"
@@ -6,9 +6,6 @@ import { generateUniqueNumber } from "../utils/mono_utils/common"
 const addNewTickets = async (uId: string, eventId: string, totalTicket: number = 1) => {
     let ticketIds: number[] = []
     try {
-        // const path: string = `tickets`
-        // const counterPath: string = `metadata/${eventId}/ticketLastId`
-
         // database address
         const path: string = `users/${uId}/tickets`
 
@@ -19,15 +16,13 @@ const addNewTickets = async (uId: string, eventId: string, totalTicket: number =
             other.ticketType = eventId
             other.created = serverTimestamp()
             other.ticketTmpNo = generateUniqueNumber()
-
-            // return await addNewItemWithIcId(counterPath, dataPath, other, totalTicket)
-
+            other.expired = serverTimestamp()
             // add process
-            await addRealTimeData(path, other)
-
+            const key = await addRealTimeData(path, other)
+            // update expired date
+            await updateRealTimeData(`users/${uId}/tickets/${key}`, { "expired": increment(Number(process.env.NEXT_PUBLIC_TICKET_EXPIRE_DAY_LIMIT) * 24 * 60 * 60 * 1000) })
             // save [ticketTmpNo] in ticketIds
             ticketIds.push(other.ticketTmpNo)
-
             totalTicket -= 1
         }
     } catch (error) {
