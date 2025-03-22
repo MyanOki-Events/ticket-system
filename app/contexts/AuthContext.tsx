@@ -9,7 +9,7 @@ import { getFirebaseUser, signInWithFirebase, signOutFromFirebase } from "../uti
 type AuthContextType = {
     user: User | null;
     loading: boolean;
-    login: () => void;
+    // login: () => void;
 };
 
 // ✅ Create AuthContext
@@ -56,7 +56,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [session]);
 
     return (
-        <AuthContext.Provider value={{ user, loading, login: async () => await signIn("google", { callbackUrl: "/" }) }}>
+        <AuthContext.Provider value={{ user, loading, 
+        // login: async () => await signIn("google", { callbackUrl: "/" }) 
+        }}>
             {
                 // loading ? LoadingLayout() : children
                 children
