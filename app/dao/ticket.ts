@@ -26,7 +26,10 @@ export default class Ticket {
     // ticket order finish date | payment finish date
     updated: any
 
-    constructor(userId: string, ticketNo: string | null = null, ticketTmpNo: number = 0, ticketId: string = "", created: any = "", updated: any = "", isUsed: boolean = false, isPaid = false, ticketType: string = "") {
+    // ticket expire date (2 days)
+    expired: any
+
+    constructor(userId: string, ticketNo: string | null = null, ticketTmpNo: number = 0, ticketId: string = "", created: any = "", updated: any = "", expired: any = "", isUsed: boolean = false, isPaid = false, ticketType: string = "") {
         this.userId = userId
         this.ticketNo = ticketNo
         this.ticketTmpNo = ticketTmpNo
@@ -36,5 +39,6 @@ export default class Ticket {
         this.ticketType = ticketType
         this.created = created
         this.updated = updated
+        this.expired = expired
     }
 }
