@@ -72,7 +72,7 @@ const PageContent = () => {
     setShowModal(false);
     try {
       deleteTicketByIds(userId, String(delTicket.get("ticketId")))
-      setMessage(`The ticket with ID (${delTicket.get("ticketNo")}) is successfully deleted!`);
+      setMessage(`The ticket with ID (T${delTicket.get("ticketNo")}) is successfully deleted!`);
 
       // 削除後、状態を更新
       setAutoIncrementedTickets((prevTickets) => {
@@ -114,9 +114,10 @@ const PageContent = () => {
   useEffect(() => {
     _getTicketsByUserId()
     if (purchaseStatus) {
-      setMessage('Booking of the ticket(s) are successully completed!We will send email of booking detail to your email.'); // メッセージをstateにセット
+      setMessage('Booking of the ticket(s) are successully completed!We will send email of booking detail to your email.');
+      // メッセージ表示ステータスをクリアする
     }
-  }, [_getTicketsByUserId])
+  }, [_getTicketsByUserId, purchaseStatus])
 
   const { loading } = useAuth()
 
@@ -132,7 +133,12 @@ const PageContent = () => {
             {/* Info or Error Message */}
             <MessageAlert message={message} type="info" />
             <MessageAlert message={error} type="danger" />
-            <TicketPDFDownload baseUrl={baseUrl} />
+            {/* Show TicketPDFDownload only if there is at least one paid ticket */}
+            {autoIncrementedTickets.length > 0 && autoIncrementedTickets.some(group => 
+              group.tickets.some(ticket => ticket.isPaid)
+            ) && (
+              <TicketPDFDownload baseUrl={baseUrl} />
+            )}
             <div className="row">
               {autoIncrementedTickets.length === 0 ? (
                 <div className="col-12 mb-4">
@@ -141,7 +147,8 @@ const PageContent = () => {
                     <span style={{ fontSize: '0.8rem' }}>Please move to 'Booking' page and reserve a ticket.</span>
                   </div>
                 </div>
-              ) : (autoIncrementedTickets.map((group, groupIndex) => (
+              ) : (
+                autoIncrementedTickets.map((group, groupIndex) => (
                 <div key={groupIndex} className="col-12 mb-4">
                   {group.tickets.map((ticket) => (
                     <div key={ticket.ticketId} className="col-12 mb-4">
@@ -149,9 +156,6 @@ const PageContent = () => {
                         <div className="d-flex justify-content-between align-items-center p-2">
                           <span className="beautiful-header text-dark" style={{ fontSize: '20px' }}>
                             {/* if paid isn't finished yet, temporary number will show */}
-                            {/* {
-                              ticket.ticketNo ? `Ticket No : ${ticket.ticketNo}` : `Temporary Ticket No : ${ticket.ticketTmpNo}`
-                            } */}
                             {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventTitle} ({ticket.autoIncrementedId})
                           </span>
                           {ticket.isPaid ? (

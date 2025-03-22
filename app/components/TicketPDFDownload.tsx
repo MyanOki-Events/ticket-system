@@ -74,7 +74,7 @@ return (
                 fontSize: '14px'
                 }}
             >
-            Download Ticket PDF
+            Download Ticket(s) PDF
         </button>
         </PDFDownloadLink>
     </div>
