@@ -24,6 +24,8 @@ const Header = ({ }) => {
       setActiveItem('booking');
     } else if (pathname === '/tickets/detail') {
       setActiveItem('detail');
+    } else if (pathname === '/settings') {
+      setActiveItem('edit');
     } else if (pathname === '/admin/event' || pathname === '/admin/event/add_new' || pathname.includes('/admin/event/edit_old')) {
       setActiveItem('event');
     } else if (pathname === '/admin' || pathname.includes('/admin/member') || pathname.includes('/admin/ticket') || pathname.includes('/admin/qrcode')) {
@@ -81,6 +83,9 @@ const Header = ({ }) => {
               <li className={`nav-item ${activeItem === 'detail' ? 'active' : ''}`}>
                 <a className="nav-link" href="/tickets/detail" onClick={() => handleItemClick('detail')}>Detail</a>
               </li>
+              <li className={`nav-item ${activeItem === 'edit' ? 'active' : ''} d-md-none d-md-block`}>
+                <a className="nav-link" href="/settings" onClick={() => handleItemClick('edit')}>Edit Profile</a>
+              </li>
               {/* Show Admin Dashboard link if user is admin */}
               {session && session.user?.role === 99 && (
                 <>
@@ -102,26 +107,26 @@ const Header = ({ }) => {
                     {(userDisplayName && userDisplayName !== "") ? userDisplayName : userGoogleName}
                   </span>
                   {/* Ensure Logout button is always at the end */}
-                  {/* <button className="btn btn-danger" onClick={handleLogout}>
-                    Logout
-                  </button> */}
-                  <div className="btn-group">
-                    {/* <button className="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Large button
-                    </button> */}
-                    <i className="bi bi-gear dropdown-toggle text-white fs-5 btn rounded" data-bs-toggle="dropdown" aria-expanded="false"></i>
+                  <div className="d-none d-sm-block btn-group">
+                    <i
+                      className="bi bi-gear dropdown-toggle text-white fs-5 btn rounded"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    ></i>
                     <ul className="dropdown-menu">
                       <li>
-                        {/* <Link className="btn btn-primary w-100" href={``}>Edit Profile</Link> */}
-                        <Link href={`/settings`}>Edit Profile</Link>
+                        {/* Edit Profile Link */}
+                        <Link href={`/settings`} className="dropdown-item">Edit Profile</Link>
                       </li>
                       <li className="border-bottom"></li>
                       <li>
-                        <span onClick={handleLogout}>Logout</span>
-                        {/* <button className="btn btn-danger w-100" onClick={handleLogout}>Logout</button> */}
+                        <span onClick={handleLogout} className="dropdown-item">Logout</span>
                       </li>
                     </ul>
                   </div>
+                  <button className="d-md-none d-md-block btn btn-danger" onClick={handleLogout}>
+                    Logout
+                  </button>
                 </>
               )}
             </div>

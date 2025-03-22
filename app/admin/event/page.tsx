@@ -31,7 +31,7 @@ const EventPage = () => {
             {
                 loading ?
                     <LoadingLayout /> :
-                    <div className="container">
+                    <div className="container" style={{ padding: '20px', backgroundColor: '#f8f9fa' }}>
                         {/* Page Title */}
                         <h3 className="text-center" style={{ paddingTop: '60px', color: '#2a9d8f' }}>All Events</h3>
 
