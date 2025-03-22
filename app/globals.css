@@ -85,18 +85,18 @@ ul.dropdown-menu.show {
   /* gap: .5rem; */
 }
 
-ul.dropdown-menu.show > li {
+ul.dropdown-menu.show>li {
   display: flex;
   /* padding: 0 1rem; */
 }
 
-ul.dropdown-menu.show > li > * {
+ul.dropdown-menu.show>li>* {
   width: 100%;
   cursor: pointer;
   padding: .5rem 1rem;
 }
 
-ul.dropdown-menu.show > li > *:hover {
+ul.dropdown-menu.show>li>*:hover {
   background-color: rgb(230, 228, 228);
 }
 
@@ -112,7 +112,7 @@ ul.dropdown-menu.show > li > *:hover {
   border-radius: 0 .37rem .37rem 0;
 }
 
-.update-actions > * {
+.update-actions>* {
   z-index: 99;
   /* padding: 0 .5rem;
   background-color: #dee2e6;
@@ -128,3 +128,81 @@ ul.dropdown-menu.show > li > *:hover {
 /* .update-actions > *.active:hover {
   cursor: pointer;
 } */
+
+
+/* qr-code page css START */
+
+#confirmTicketModal.modal.fade.show {
+  background-color: rgba(13, 110, 253, 0.75) !important;
+}
+
+.qr-model-close {
+  cursor: pointer;
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  left: 50%;
+  top: 0px;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  border-radius: 50%;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.qr-model-close:hover {
+  cursor: pointer;
+  background-color: rgb(225, 222, 222);
+}
+
+.ticket-loader {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  position: relative;
+  animation: rotate 1s linear infinite
+}
+
+.ticket-loader::before {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  inset: 0px;
+  border-radius: 50%;
+  border: 5px solid #ffc107;
+  animation: prixClipFix 2s linear infinite;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg)
+  }
+}
+
+@keyframes prixClipFix {
+  0% {
+    clip-path: polygon(50% 50%, 0 0, 0 0, 0 0, 0 0, 0 0)
+  }
+
+  25% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 0, 100% 0, 100% 0)
+  }
+
+  50% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%)
+  }
+
+  75% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%)
+  }
+
+  100% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0)
+  }
+}
+
+/* qr-code page css END */

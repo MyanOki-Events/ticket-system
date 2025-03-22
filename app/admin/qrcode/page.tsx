@@ -8,13 +8,22 @@ import { Html5QrcodeScanner, Html5QrcodeScanType } from "html5-qrcode";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
+enum TickeStatus {
+    NONE, // init state and read data from database
+    FAIL, // no data record at database
+    ALREADY_USED, // already used ticket
+    NOT_USED // usable ticket
+}
+
 export default function QRScanner() {
-    const [scannedData, setScannedData] = useState("");
+    const [scannedData, setScannedData] = useState<string | null>("");
     const [scanQRShow, setScanQRShow] = useState(true);
     const modalRef = useRef<HTMLDivElement | null>(null);
     const [ticketData, setTicketData] = useState<Ticket | null>()
     const [ticketModal, setTicketModal] = useState<null | any>();
     const [confirmBtnGuard, setConfirmBtnGuard] = useState(false)
+    const [scanDataIsValid, setScannedDataIsValid] = useState(true) // is recommanded data structure?
+    const [tickeStatus, setTickeStatus] = useState<TickeStatus>(TickeStatus.NONE)
 
     // Import Bootstrap JS on client-side
     useEffect(() => {
@@ -42,6 +51,7 @@ export default function QRScanner() {
         // startScanner()
         // clean ticket data
         setTicketData(null)
+        setTickeStatus(TickeStatus.NONE)
     };
 
     const confirmTicket = async () => {
@@ -49,7 +59,7 @@ export default function QRScanner() {
         setConfirmBtnGuard(true)
 
         // update ticket state
-        const data: string[] = scannedData.split("/")
+        const data: string[] = scannedData?.split("/") ?? []
         await updateTicketByIds(String(data.at(-2)), String(data.at(-1)), { "isUsed": true })
 
         // close modal
@@ -90,31 +100,51 @@ export default function QRScanner() {
         // get ticket & its information form firebase database by using qrcode scan data as parameter
         const getTickeInfo = async () => {
             try {
-                const data: string[] = scannedData.split("/")
+                const data: string[] = scannedData?.split("/") ?? []
                 if (data && data.length >= 2) {
-                    const result = await fetch('/api/confirm-ticket', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            paramOne: String(data.at(-2)),
-                            paramTwo: String(data.at(-1))
-                        }),
-                    });
+                    setScannedDataIsValid(true)
+                    openModal()
 
-                    const responseData = await result.json()
-                    if (responseData?.data) {
-                        setTicketData(responseData.data)
-                        openModal()
-                    }
+                    // add delay for showing loading(validation process)
+                    setTimeout(async () => {
+                        const result = await fetch('/api/confirm-ticket', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                paramOne: String(data.at(-2)),
+                                paramTwo: String(data.at(-1))
+                            }),
+                        });
+
+                        const responseData = await result.json()
+                        if (responseData?.data) {
+                            // setTicketData(responseData.data)
+                            // openModal()
+                            console.log(responseData.data)
+                            if (responseData.data.isUsed) {
+                                setTickeStatus(TickeStatus.ALREADY_USED)
+                            } else {
+                                setTickeStatus(TickeStatus.NOT_USED)
+                            }
+                        } else {
+                            // openModal()
+                            setTickeStatus(TickeStatus.FAIL)
+                        }
+                    }, 500)
+                } else {
+                    setScannedDataIsValid(false)
+                    openModal()
                 }
             } catch (error) {
                 console.log(error)
             }
         }
 
-        getTickeInfo()
+        if (scannedData) {
+            getTickeInfo()
+        }
     }, [scannedData])
 
     return (
@@ -130,28 +160,61 @@ export default function QRScanner() {
                 </div>
             </div>
 
-            {/* Bootstrap Modal */}
-            <div className="modal fade" ref={modalRef} id="myModal" tabIndex={-1} aria-labelledby="modalLabel" aria-hidden="true">
-                <div className="modal-dialog">
+            <div className="modal fade" ref={modalRef} id="confirmTicketModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex={-1} aria-labelledby="modalLabel" aria-hidden="true">
+                <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="modalLabel">Ticket No : {ticketData?.ticketNo || ticketData?.ticketTmpNo}</h5>
-                            <button type="button" className="btn-close" onClick={closeModal}></button>
-                        </div>
-                        <div className="modal-body">
-                            <p className="fs-6">Booking Date : {convertDate(ticketData?.created)}</p>
-                            <p className="fs-6">Charged Date : {convertDate(ticketData?.updated)}</p>
-                        </div>
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" onClick={closeModal}>
-                                Close
-                            </button>
-                            {ticketData && !ticketData?.isUsed &&
-                                <button type="button" className="btn btn-success" onClick={confirmTicket} disabled={confirmBtnGuard}>
-                                    Confirm
-                                </button>
-                            }
-                        </div>
+                        {
+                            scanDataIsValid ?
+                                <>
+                                    {
+                                        tickeStatus === TickeStatus.NONE ?
+                                            <div className="d-flex flex-column justify-content-center align-items-center gap-4 position-relative py-5">
+                                                <span className="qr-model-close text-warning" onClick={closeModal}>
+                                                    <i className="bi bi-x-lg"></i>
+                                                </span>
+
+                                                <div className="ticket-loader mt-3"></div>
+                                                <span className="fs-6 text-warning font-monospace">
+                                                    Validating Ticket...
+                                                </span>
+                                            </div> :
+                                            tickeStatus === TickeStatus.FAIL ?
+                                                <div className="d-flex flex-column p-3 justify-content-center align-items-center position-relative py-5">
+                                                    <span className="qr-model-close text-danger" onClick={closeModal}>
+                                                        <i className="bi bi-x-lg"></i>
+                                                    </span>
+
+                                                    <span className="fs-3 text-danger font-monospace">Sorry</span>
+                                                    <span className="fs-6 text-danger font-monospace">Your Ticket(QR-Code) is Invalid!</span>
+                                                </div> :
+                                                tickeStatus === TickeStatus.ALREADY_USED ?
+                                                    <div className="d-flex flex-column p-3 justify-content-center align-items-center position-relative py-5">
+                                                        <span className="qr-model-close text-danger" onClick={closeModal}>
+                                                            <i className="bi bi-x-lg"></i>
+                                                        </span>
+
+                                                        <span className="fs-3 text-danger font-monospace">Sorry</span>
+                                                        <span className="fs-6 text-danger font-monospace">Your Ticket(QR-Code) is already used!</span>
+                                                    </div> :
+                                                    <div className="d-flex flex-column p-3 justify-content-center align-items-center position-relative py-5">
+                                                        <span className="qr-model-close text-success" onClick={confirmTicket}>
+                                                            <i className="bi bi-x-lg"></i>
+                                                        </span>
+
+                                                        <span className="fs-3 text-success font-monospace">Thank You</span>
+                                                        <span className="fs-6 text-success font-monospace">for attending our event!</span>
+                                                    </div>
+                                    }
+                                </> :
+                                <div className="d-flex flex-column p-3 justify-content-center align-items-center position-relative py-5">
+                                    <span className="qr-model-close text-danger" onClick={closeModal}>
+                                        <i className="bi bi-x-lg"></i>
+                                    </span>
+
+                                    <span className="fs-3 text-danger font-monospace">Sorry</span>
+                                    <span className="fs-6 text-danger font-monospace">Your Ticket(QR-Code) is Invalid!</span>
+                                </div>
+                        }
                     </div>
                 </div>
             </div>
