@@ -179,7 +179,7 @@ const PageContent = () => {
                               className="img-fluid rounded"
                               onMouseDown={(e) => e.preventDefault()}
                               onTouchStart={(e) => e.preventDefault()}
-                              style={{ maxHeight: '250px', objectFit: 'cover' }}
+                              style={{ maxHeight: '250px', objectFit: 'cover', paddingLeft: '5px', paddingRight: '5px' }}
                               height={250}
                               width={1000}
                               priority
