@@ -3,12 +3,13 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./login.module.css";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { Suspense, useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@/app/common/styles/globals.css';
 import Image from 'next/image';
-import { useAuth } from "./contexts/AuthContext";
+// import { useAuth } from "./contexts/AuthContext";
+import { logAnalyticsEvent } from "./utils/firebase/if/firebase_analytics_if";
 // import LoadingLayout from "./components/LoadingLayout";
 
 const LoginForm = () => {
@@ -22,23 +23,35 @@ const LoginForm = () => {
   const [showModal, setShowModal] = useState(false);
 
   // get functions from Wrapper Auth
-  const { login } = useAuth()
+  // const { login } = useAuth()
+
+  // init state
+  useEffect(() => {
+    const init = async () => {
+      await logAnalyticsEvent("page_view", { a_my_page_name: "Setup Login Page", debug_mode: true })
+    }
+
+    init()
+  })
 
   // If already authenticated redirect booking
   useEffect(() => {
     if (status === "authenticated") {
       if (session.user.role === 99) {
+        logAnalyticsEvent("page_redirect", { a_my_redirect_page_name: callbackUrl ?? "/admin", debug_mode: true })
         router.replace(callbackUrl ?? "/admin");
       }
       if (session.user.role === 0) {
+        logAnalyticsEvent("page_redirect", { a_my_redirect_page_name: "/tickets/detail", debug_mode: true })
         router.replace("/tickets/detail");
       }
     }
   }, [status, router]);
 
   // Login Handle
-  const handleSignIn = () => {
-    login()
+  const handleSignIn = async () => {
+    await logAnalyticsEvent("button_clicked", { a_my_button_name: "Sign in with Gmail", debug_mode: true })
+    await signIn("google", { "callbackUrl": callbackUrl ?? "/" })
   };
 
   // ✅ User Poilcy Handle
