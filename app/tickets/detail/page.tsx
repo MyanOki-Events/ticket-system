@@ -110,7 +110,7 @@ const PageContent = () => {
   useEffect(() => {
     getAllEvent()
       .then((result) => setEventTickets(result))
-  })
+  },[])
 
   useEffect(() => {
     _getTicketsByUserId()
@@ -194,35 +194,35 @@ const PageContent = () => {
                               <table className="table table-bordered" style={{ border: '2px solid #3498db', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
                                 <tbody>
                                   <tr>
-                                    <td style={{ fontSize: '0.8rem' }}><strong>Date:</strong> {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventDate}</td>
-                                    <td style={{ fontSize: '0.8rem' }}><strong>Place:</strong> {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventPlace}</td>
+                                    <td style={{ fontSize: '0.8rem', width: '50%' }}><strong>Date:</strong> {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventDate}</td>
+                                    <td style={{ fontSize: '0.8rem', width: '50%' }}><strong>Place:</strong> {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventPlace}</td>
                                   </tr>
                                   <tr>
-                                    <td style={{ fontSize: '0.8rem' }}><strong>Time:</strong> {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventTime}</td>
-                                    <td style={{ fontSize: '0.8rem' }}><strong>Address:</strong> {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.location}</td>
+                                    <td style={{ fontSize: '0.8rem', width: '50%' }}><strong>Time:</strong> {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.eventTime}</td>
+                                    <td style={{ fontSize: '0.8rem', width: '50%' }}><strong>Address:</strong> {eventTickets.filter((evt) => evt.eventId == ticket.ticketType).pop()?.location}</td>
                                   </tr>
                                   <tr>
-                                    <td style={{ fontSize: '0.8rem' }}>
+                                    <td style={{ fontSize: '0.8rem', width: '50%' }}>
                                       <strong>Paid Status: </strong>
                                       {ticket.isPaid ? (
-                                        <span className="text-success" style={{ fontSize: '15px', fontWeight: 'bold' }}>
-                                          <i className="bi bi-check-circle-fill" style={{ fontSize: '15px' }}></i> Paid
-                                        </span>
-                                      ) : (
-                                        <span className="text-danger" style={{ fontSize: '15px', fontWeight: 'bold' }}>
-                                          <i className="bi bi-x-circle-fill" style={{ fontSize: '15px' }}></i> Not Paid
-                                        </span>
+                                        <span className="badge bg-success text-white" style={{ fontSize: '0.6rem', fontWeight: 'bold' }}>
+                                        <i className="bi bi-check-circle-fill" style={{ fontSize: '0.8rem' }}></i> Paid
+                                      </span>
+                                    ) : (
+                                      <span className="badge bg-warning text-dark" style={{ fontSize: '0.6rem', fontWeight: 'bold' }}>
+                                        <i className="bi bi-hourglass-split" style={{ fontSize: '0.8rem' }}></i> Not Yet
+                                      </span>
                                       )}
                                     </td>
-                                    <td style={{ fontSize: '0.8rem' }}>
+                                    <td style={{ fontSize: '0.8rem', width: '50%' }}>
                                       <strong>Used Status: </strong>
                                       {ticket.isUsed ? (
-                                        <span className="badge bg-success text-white" style={{ fontSize: '14px', fontWeight: 'bold' }}>
-                                          <i className="bi bi-check-circle-fill" style={{ fontSize: '15px' }}></i> Used
+                                        <span className="badge bg-success text-white" style={{ fontSize: '0.6rem', fontWeight: 'bold' }}>
+                                          <i className="bi bi-check-circle-fill" style={{ fontSize: '0.8rem' }}></i> Used
                                         </span>
                                       ) : (
-                                        <span className="badge bg-warning text-dark" style={{ fontSize: '14px', fontWeight: 'bold' }}>
-                                          <i className="bi bi-hourglass-split" style={{ fontSize: '15px' }}></i> Not Yet
+                                        <span className="badge bg-warning text-dark" style={{ fontSize: '0.6rem', fontWeight: 'bold' }}>
+                                          <i className="bi bi-hourglass-split" style={{ fontSize: '0.8rem' }}></i> Not Yet
                                         </span>
                                       )}
                                     </td>

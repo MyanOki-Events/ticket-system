@@ -18,7 +18,7 @@ const EventPage = () => {
                 setEventList((old) => old = data)
             })
             .catch((error) => console.log(error))
-    }, [eventList])
+    }, [])
 
     const deleteEvent = async (eventId: string) => {
         await deleteEventById(eventId)
