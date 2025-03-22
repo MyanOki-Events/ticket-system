@@ -29,7 +29,7 @@ export async function POST(req: Request) {
             "ticketIds": "Ticket Ids: [Ticket Ids]",
             "paymentMethod": "Payment Method: [Payment Method]"
           },
-          "confirmation": "Your ticket(s) are now confirmed! Thank you for your bookings. We would like to request you to complete payment within three days including booking day.\nOtherwise your booking ticket(s) will be cancelled automatically.",
+          "confirmation": "Your ticket(s) are now confirmed! Thank you for your bookings. We would like to request you to complete payment within [numberOfDays] days including booking day.\nOtherwise your booking ticket(s) will be cancelled automatically.",
           "questions": "If you have any questions or need assistance, feel free to reach out to us from (在沖縄ミャンマー人会) Facebook Page Messenger.",
           "closing": "We look forward to seeing you at the festival and sharing this exciting experience with you! 🌟",
           "signature": "Best regards,\nOkinawa Myanmar Association,Naha City, Okinawa Dist,Japan"
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
     emailText += `${emailBody.paymentSummary.amountPaid.replace('[Amount Paid]', amountPaid)}\n`;
     emailText += `${emailBody.paymentSummary.ticketIds.replace('[Ticket Ids]', ticketIds)}\n`;
     emailText += `${emailBody.paymentSummary.paymentMethod.replace('[Payment Method]', paymentMethod)}\n\n`;
-    emailText += emailBody.confirmation + '\n';
+    emailText += `${emailBody.confirmation.replace('[numberOfDays]', process.env.NEXT_PUBLIC_TICKET_EXPIRE_DAY_LIMIT! )}\n`;
     emailText += emailBody.questions + '\n\n';
     emailText += emailBody.closing + '\n\n';
     emailText += emailBody.signature;
