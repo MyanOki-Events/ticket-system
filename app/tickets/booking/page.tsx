@@ -312,12 +312,12 @@ const TicketsPage = () => {
                 backdrop="static"
               >
                 <Modal.Header closeButton className="bg-primary text-white">
-                  <Modal.Title style={{ fontSize: '18px' }}>Confirm Your Purchase</Modal.Title>
+                  <Modal.Title style={{ fontSize: '18px' }}>Confirm Your Bookings</Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="bg-light py-4 px-5">
                   <div className="mb-4">
                     <h5 className="text-dark mb-2" style={{ fontSize: '16px' }}>
-                      Are you sure you want to purchase {ticketCounts[selectedTicket.eventId]} tickets?
+                      Are you sure you want to reserve {ticketCounts[selectedTicket.eventId]} tickets?
                     </h5>
                     <p className="text-muted mb-1" style={{ fontSize: '14px' }}>
                       <strong>Ticket Type:</strong> {selectedTicket.eventTitle}
