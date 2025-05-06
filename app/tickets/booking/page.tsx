@@ -320,7 +320,7 @@ const TicketsPage = () => {
                       Are you sure you want to reserve {ticketCounts[selectedTicket.eventId]} tickets?
                     </h5>
                     <p className="text-muted mb-1" style={{ fontSize: '14px' }}>
-                      <strong>Ticket Type:</strong> {selectedTicket.eventTitle}
+                      <strong>Ticket Type:</strong> {selectedTicket.eventTitle} Admission Ticket
                     </p>
                     <p className="text-muted mb-1" style={{ fontSize: '14px' }}>
                       <strong>Total Price:</strong> &#165;{totalPrice(selectedTicket)}

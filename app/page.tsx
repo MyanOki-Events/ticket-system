@@ -162,6 +162,12 @@ const LoginForm = () => {
                     - We use third-party services like Google for authentication, and by using Gmail to sign in, you are also bound by Google’s privacy policy.
                     We are not responsible for the privacy practices of third-party services. Please review Google’s privacy policy for more information.
                   </p>
+                  <p className=" text-dark">
+                    5. Data Retention Period
+                    <br />
+                    - All personal data collected for the event will be retained only as long as necessary to fulfill the purposes outlined above. 
+                    Personal data will be securely deleted from our system immediately after the event.
+                  </p>
                 </div>
                 <div className="modal-footer">
                   <button

@@ -14,13 +14,25 @@ export async function POST(req: Request) {
     });
 
     if (emailType === "booking") {
+      let paymentProcess= "";
+      if (paymentMethod === "Bank Transfer") {
+         paymentProcess = "Please find below the bank account details for processing your ticket payment:\n";
+         paymentProcess+="Bank Name(銀行名): 沖縄銀行\n";
+         paymentProcess+="Branch Code(店番号/支店名): 121/大道支店\n";
+         paymentProcess+="Account Type(口座種類): 普通貯金口座\n";
+         paymentProcess+="Account Number(口座番号): 2081873\n";
+         paymentProcess+="Account Name(名前) ザイオキナワミャンマージンカイ\n\n";
+         paymentProcess+="Once the payment is completed,please kindly send bank transfer receipt to (在沖縄ミャンマー人会) Facebook Page Messenger so we can issue your ticket.";
+      } else {
+        paymentProcess = "We’re pleased to inform you that you can complete your ticket payment in person. Please visit (Royal Myanmar Restaurant in Naha) to make your payment.";
+      }
         // Set up email data
         const emailContent = {
           "bookingConfirmation": {
             "subject": "Booking Confirmation for Your [Ticket Type] Ticket(s)",
             "body": {
               "greeting": "Dear [Customer's Name],",
-              "intro": "We are pleased to confirm that your purchase of the ticket(s) has been successfully received.",
+              "intro": "We are pleased to confirm that your booking of the ticket(s) has been successfully received.",
               "paymentSummary": {
                 "event": "Name of Event: [Ticket Type]",
                 "bookingDate": "Date of Booking: [Booking Date]",
@@ -30,7 +42,8 @@ export async function POST(req: Request) {
                 "ticketIds": "Ticket Ids: [Ticket Ids]",
                 "paymentMethod": "Payment Method: [Payment Method]"
               },
-              "confirmation": "Your ticket(s) are now confirmed! Thank you for your bookings. We would like to request you to complete payment within [numberOfDays] days including booking day.\nOtherwise your booking ticket(s) will be cancelled automatically.",
+              "confirmation": "Your ticket(s) are now booked! Thank you for your bookings. We would like to request you to complete payment within [numberOfDays] days including booking day.\nOtherwise your booking ticket(s) will be cancelled automatically.",
+              "paymentProcess": paymentProcess,
               "questions": "If you have any questions or need assistance, feel free to reach out to us from (在沖縄ミャンマー人会) Facebook Page Messenger.",
               "closing": "We look forward to seeing you at the festival and sharing this exciting experience with you! 🌟",
               "signature": "Best regards,\nOkinawa Myanmar Association,Naha City, Okinawa Dist,Japan"
@@ -49,7 +62,8 @@ export async function POST(req: Request) {
         emailText += `${emailBody.paymentSummary.amountPaid.replace('[Amount Paid]', amountPaid)}\n`;
         emailText += `${emailBody.paymentSummary.ticketIds.replace('[Ticket Ids]', ticketIds)}\n`;
         emailText += `${emailBody.paymentSummary.paymentMethod.replace('[Payment Method]', paymentMethod)}\n\n`;
-        emailText += `${emailBody.confirmation.replace('[numberOfDays]', process.env.NEXT_PUBLIC_TICKET_EXPIRE_DAY_LIMIT! )}\n`;
+        emailText += `${emailBody.confirmation.replace('[numberOfDays]', process.env.NEXT_PUBLIC_TICKET_EXPIRE_DAY_LIMIT! )}\n\n`;
+        emailText += emailBody.paymentProcess + '\n';
         emailText += emailBody.questions + '\n\n';
         emailText += emailBody.closing + '\n\n';
         emailText += emailBody.signature;

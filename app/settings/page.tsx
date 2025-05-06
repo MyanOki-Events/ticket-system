@@ -57,7 +57,7 @@ const SettingsPage = () => {
             {
                 loading ?
                     <LoadingLayout /> :
-                    <div className="container">
+                    <div className="container" style={{ paddingTop: '20px'}}>
                         <h3 className="text-center" style={{ paddingTop: '60px', color: '#2a9d8f' }}>Profile</h3>
                         <div className="mb-3 col col-sm-10 col-md-6 m-auto">
                             <label htmlFor="staticEmail" className="col-form-label">Email</label>
